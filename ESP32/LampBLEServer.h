@@ -4,7 +4,7 @@
 
 class LampBLEServerCallbacks {
   public:
-    virtual void onSetColor(RgbwColor color);
+    virtual void onSetColor(HslColor color);
 };
 
 class LampBLEServer {

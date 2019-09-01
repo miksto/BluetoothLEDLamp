@@ -1,5 +1,11 @@
+#include <NeoPixelBus.h>
+#define COLOR_BYTES_LENGTH 4
+
 namespace ColorUtils
 {
 RgbwColor hslToRgbw(HslColor hsl);
-RgbwColor bytesToRgbwColor(std::string bytes);
+HslColor bytesToHslColor(uint8_t* bytes);
+RgbwColor bytesToRgbwColor(uint8_t* bytes);
+
+uint8_t* hslColorToBytes(HslColor color);
 }

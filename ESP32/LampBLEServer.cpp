@@ -14,8 +14,8 @@ class ColorCallback: public BLECharacteristicCallbacks {
     }
 
     void onWrite(BLECharacteristic *pCharacteristic) {
-      std::string value = pCharacteristic->getValue();
-      RgbwColor color = ColorUtils::bytesToRgbwColor(value);
+      uint8_t* data = pCharacteristic->getData();
+      HslColor color = ColorUtils::bytesToHslColor(data);
       lampCallbacks->onSetColor(color);
     }
 };
