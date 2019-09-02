@@ -26,15 +26,10 @@ class MainActivity : AppCompatActivity() {
 
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            super.onConnectionStateChange(gatt, status, newState)
-
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
                     Log.i(TAG, "Connected to GATT server.")
-                    Log.i(
-                        TAG, "Attempting to start service discovery: " +
-                                gatt?.discoverServices()
-                    )
+                    Log.i(TAG, "Attempting to start service discovery: " + gatt?.discoverServices())
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.i(TAG, "Disconnected from GATT server.")
@@ -44,15 +39,36 @@ class MainActivity : AppCompatActivity() {
 
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             when (status) {
-                BluetoothGatt.GATT_SUCCESS -> setColor(
-                    gatt,
-                    0x00110000,
-                    saturation_seek_bar.progress,
-                    brightness_seek_bar.progress
-                )
+                BluetoothGatt.GATT_SUCCESS -> readCurrentColor()
                 else -> Log.w(TAG, "onServicesDiscovered received: $status")
             }
         }
+
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            if (characteristic?.value != null) {
+                val data = characteristic.value
+                val brightness = data[0].toUByte().toInt()
+                val saturation = data[1].toUByte().toInt()
+                val hue = (data[3].toUByte().toInt() shl 8) or data[2].toUByte().toInt()
+
+                hue_seek_bar.progress = hue
+                saturation_seek_bar.progress = saturation
+                brightness_seek_bar.progress = brightness
+            }
+        }
+
+    }
+
+    private fun readCurrentColor() {
+        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+        val characteristic =
+            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+
+        gatt?.readCharacteristic(characteristic)
 
     }
 
@@ -65,8 +81,6 @@ class MainActivity : AppCompatActivity() {
         val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
             service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
-        Log.i(TAG, "SETTING COLOR")
-        Log.i(TAG, "gatt null?" + (gatt == null).toString())
 
 
         val data = (((color shl 8) or saturation) shl 8) or brightness
@@ -78,11 +92,9 @@ class MainActivity : AppCompatActivity() {
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            Log.d(
-                TAG,
-                "onScanResult(): ${result?.device?.address} - ${result?.device?.name}"
-            )
-            connectToDevice(result?.device)
+            Log.d(TAG, "onScanResult(): ${result?.device?.address} - ${result?.device?.name}")
+            bluetoothLeScanner.stopScan(this)
+            gatt = result?.device?.connectGatt(this@MainActivity, false, gattCallback)
         }
     }
 
@@ -102,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val seekbarListener= object : SeekBar.OnSeekBarChangeListener {
+        val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
             override fun onStartTrackingTouch(p0: SeekBar?) {
 
             }
@@ -113,7 +125,12 @@ class MainActivity : AppCompatActivity() {
 
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 // Display the current progress of SeekBar
-                setColor(gatt,hue_seek_bar.progress, saturation_seek_bar.progress, brightness_seek_bar.progress);
+                setColor(
+                    gatt,
+                    hue_seek_bar.progress,
+                    saturation_seek_bar.progress,
+                    brightness_seek_bar.progress
+                );
             }
         }
 
@@ -128,22 +145,22 @@ class MainActivity : AppCompatActivity() {
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )) {
-            PermissionChecker.PERMISSION_GRANTED -> startScan()
+            PermissionChecker.PERMISSION_GRANTED -> connectToLampIfNecessary()
             else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
         }
     }
 
-    private fun startScan() {
-        Log.i(TAG, "Start Scan")
-        bluetoothLeScanner.startScan(
-            mutableListOf<ScanFilter>(lampScanFilter),
-            ScanSettings.Builder().build(),
-            scanCallback
-        )
-    }
-
-    private fun connectToDevice(device: BluetoothDevice?) {
-        gatt = device?.connectGatt(this, false, gattCallback)
+    private fun connectToLampIfNecessary() {
+        if (gatt == null) {
+            Log.i(TAG, "Start Scan")
+            bluetoothLeScanner.startScan(
+                mutableListOf<ScanFilter>(lampScanFilter),
+                ScanSettings.Builder().build(),
+                scanCallback
+            )
+        } else {
+            gatt?.connect()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -172,6 +189,13 @@ class MainActivity : AppCompatActivity() {
         Log.d("ScanDeviceActivity", "onStop()")
         super.onStop()
         bluetoothLeScanner.stopScan(scanCallback)
+        gatt?.disconnect();
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        gatt?.close()
+        gatt = null
     }
 
 }

@@ -1,8 +1,5 @@
 #include "LampBLEServer.h"
 #include "ColorUtils.h"
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
 
 class ColorCallback: public BLECharacteristicCallbacks {
   private:
@@ -20,20 +17,27 @@ class ColorCallback: public BLECharacteristicCallbacks {
     }
 };
 
-void LampBLEServer::setup(LampBLEServerCallbacks* callbacks) {
+void LampBLEServer::setup() {
   BLEDevice::init("LedLAMP");
-  BLEServer *pServer = BLEDevice::createServer();
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  server = BLEDevice::createServer();
+  service = server->createService(SERVICE_UUID);
 
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
+  colorCharacteristic = service->createCharacteristic(
                                          CHARACTERISTIC_UUID_COLOR,
                                          BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
 
-  pCharacteristic->setCallbacks(new ColorCallback(callbacks));
-  pService->start();
+  service->start();
+  BLEAdvertising *advertising = server->getAdvertising();
+  advertising->start();
+}
 
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
+void LampBLEServer::setColorCharacteristic(HslColor color) {
+  uint8_t* data = ColorUtils::hslColorToBytes(color);
+  colorCharacteristic->setValue(data, COLOR_BYTES_LENGTH);
+}
+
+void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks) {
+  colorCharacteristic->setCallbacks(new ColorCallback(callbacks));
 }

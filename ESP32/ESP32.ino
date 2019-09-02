@@ -59,7 +59,9 @@ void setup() {
   HslColor color = Storage::loadColor();
   flashOn(color);
   displayColor(color);
-  lampServer.setup(new LampCallbacks());
+  lampServer.setup();
+  lampServer.setCallbacks(new LampCallbacks());
+  lampServer.setColorCharacteristic(color);
 }
 
 void loop() {
