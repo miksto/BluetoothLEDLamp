@@ -14,4 +14,10 @@ void logColorAsBytes(const char* tag, HslColor color) {
   uint8_t* bytes = ColorUtils::hslColorToBytes(color);
   Log::logColorBytes(tag, bytes);
 }
+
+void logColor(const char* tag, HslColor color) {
+  char buffer [50];
+  sprintf(buffer, "%s: H:%3.f S:%3.f L:%3.f", tag, color.H * COLOR_HUE_INTEGER_MAX, color.S * COLOR_SATURATION_INTEGER_MAX, color.L * COLOR_LIGHTNESS_INTEGER_MAX);
+  Serial.println(buffer);
+}
 };

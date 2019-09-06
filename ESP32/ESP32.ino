@@ -4,7 +4,7 @@
 #include "Storage.h"
 #include "Log.h"
 
-#define LED_PIN 18
+#define LED_PIN 14
 #define LED_COUNT 121
 
 NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> strip(LED_COUNT, LED_PIN);

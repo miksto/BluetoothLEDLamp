@@ -3,6 +3,9 @@
 
 #include <NeoPixelBus.h>
 #define COLOR_BYTES_LENGTH 4
+#define COLOR_HUE_INTEGER_MAX 65535
+#define COLOR_LIGHTNESS_INTEGER_MAX 255
+#define COLOR_SATURATION_INTEGER_MAX 255
 
 namespace ColorUtils
 {
