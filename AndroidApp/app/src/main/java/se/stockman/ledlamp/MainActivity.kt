@@ -2,35 +2,64 @@ package se.stockman.ledlamp
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
+import android.provider.Settings
 import android.util.Log
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import kotlinx.android.synthetic.main.content_main.*
 
-const val TAG = "ScanDeviceActivity"
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        val TAG: String? = MainActivity::class.simpleName
+    }
 
     val handler = Handler()
 
+    val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
+
+        override fun onStartTrackingTouch(p0: SeekBar?) {
+
+        }
+
+        override fun onStopTrackingTouch(p0: SeekBar?) {
+
+        }
+
+        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+            // Display the current progress of SeekBar
+            val brightnessFactor = seekbar_brighness.progress / 100f
+
+            val color = RgbColor(
+                (seekbar_color_red.progress * brightnessFactor).toInt(),
+                (seekbar_color_green.progress * brightnessFactor).toInt(),
+                (seekbar_color_blue.progress * brightnessFactor).toInt()
+            )
+            ledLamp.setColor(color)
+        }
+    }
 
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onConnectionStateChange(connected: Boolean) {
             handler.post {
-                hue_seek_bar.isEnabled = connected
-                saturation_seek_bar.isEnabled = connected
-                lightness_seek_bar.isEnabled = connected
+                seekbar_color_red.isEnabled = connected
+                seekbar_color_green.isEnabled = connected
+                seekbar_color_blue.isEnabled = connected
+                seekbar_brighness.isEnabled = connected
             }
         }
 
-        override fun onColorChanged(color: HlsColor) {
-            hue_seek_bar.progress = color.hue
-            saturation_seek_bar.progress = color.saturation
-            lightness_seek_bar.progress = color.lightness
+        override fun onColorChanged(color: RgbColor) {
+            seekbar_color_red.progress = color.red
+            seekbar_color_green.progress = color.green
+            seekbar_color_blue.progress = color.blue
+            seekbar_brighness.progress = seekbar_brighness.max
         }
     }
 
@@ -44,50 +73,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val lampFinder: LampDeviceDiscovery = LampDeviceDiscovery(lampDeviceFoundCallback)
-    private var ledLamp: LedLamp = LedLamp(lampCallback)
+    private var ledLamp: LedLamp = LedLamp(this, lampCallback)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        startService(NotificationListener.createIntent(this))
 
-        val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
-            override fun onStartTrackingTouch(p0: SeekBar?) {
+        seekbar_color_red.setOnSeekBarChangeListener(seekbarListener)
+        seekbar_color_green.setOnSeekBarChangeListener(seekbarListener)
+        seekbar_color_blue.setOnSeekBarChangeListener(seekbarListener)
+        seekbar_brighness.setOnSeekBarChangeListener(seekbarListener)
 
-            }
-
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-
-            }
-
-            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                // Display the current progress of SeekBar
-                val color = HlsColor(
-                    hue_seek_bar.progress,
-                    saturation_seek_bar.progress,
-                    lightness_seek_bar.progress
-                )
-                ledLamp.setColor(color)
-            }
-        }
-
-        hue_seek_bar.setOnSeekBarChangeListener(seekbarListener)
-        saturation_seek_bar.setOnSeekBarChangeListener(seekbarListener)
-        lightness_seek_bar.setOnSeekBarChangeListener(seekbarListener)
-
-        hue_seek_bar.isEnabled = false
-        saturation_seek_bar.isEnabled = false
-        lightness_seek_bar.isEnabled = false
+        seekbar_color_red.isEnabled = false
+        seekbar_color_green.isEnabled = false
+        seekbar_color_blue.isEnabled = false
+        seekbar_brighness.isEnabled = false
     }
 
     override fun onStart() {
         super.onStart()
-        when (PermissionChecker.checkSelfPermission(
+        val permission = PermissionChecker.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
-        )) {
-            PermissionChecker.PERMISSION_GRANTED -> connectToLampIfNecessary()
-            else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+        )
+
+        val notificationAccessEnabled =
+            NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
+        if (!notificationAccessEnabled) {
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            startActivity(intent)
+        } else {
+            when (permission) {
+                PermissionChecker.PERMISSION_GRANTED -> connectToLampIfNecessary()
+                else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+            }
         }
     }
 
@@ -123,9 +144,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        Log.d("ScanDeviceActivity", "onStop()")
         super.onStop()
-        lampFinder.stop();
+        lampFinder.stop()
         ledLamp.disconnect()
     }
 

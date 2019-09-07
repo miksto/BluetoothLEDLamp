@@ -9,10 +9,10 @@
     tools:showIn="@layout/activity_main">
 
     <SeekBar
-        android:id="@+id/hue_seek_bar"
+        android:id="@+id/seekbar_color_red"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:max="65535"
+        android:max="200"
         android:min="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -20,11 +20,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <SeekBar
-        android:id="@+id/saturation_seek_bar"
+        android:id="@+id/seekbar_color_green"
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:layout_marginTop="100dp"
-        android:max="255"
+        android:max="200"
         android:min="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -32,11 +32,23 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <SeekBar
-        android:id="@+id/lightness_seek_bar"
+        android:id="@+id/seekbar_color_blue"
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:layout_marginTop="200dp"
-        android:max="180"
+        android:max="200"
+        android:min="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <SeekBar
+        android:id="@+id/seekbar_brighness"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="300dp"
+        android:max="100"
         android:min="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

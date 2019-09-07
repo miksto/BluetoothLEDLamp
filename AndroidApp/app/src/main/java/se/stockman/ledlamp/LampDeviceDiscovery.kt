@@ -10,9 +10,13 @@ import android.util.Log
  */
 const val BLE_DEVICE_MAC = "30:AE:A4:CA:DE:76"
 
-class LampDeviceDiscovery(callback: Callback) {
+class LampDeviceDiscovery(val callback: Callback) {
+    companion object {
+        val TAG: String? = LampDeviceDiscovery::class.simpleName
+    }
+
     interface Callback {
-        fun onDeviceFound(device: BluetoothDevice);
+        fun onDeviceFound(device: BluetoothDevice)
     }
 
     private val lampScanFilter =
@@ -25,11 +29,22 @@ class LampDeviceDiscovery(callback: Callback) {
         }
 
     fun findDevice() {
-        bluetoothLeScanner.startScan(
-            mutableListOf<ScanFilter>(lampScanFilter),
-            ScanSettings.Builder().build(),
-            scanCallback
-        )
+        val pairedDevices: Set<BluetoothDevice>? =
+            BluetoothAdapter.getDefaultAdapter().bondedDevices
+        val device =
+            pairedDevices?.find { bluetoothDevice -> bluetoothDevice.address == BLE_DEVICE_MAC }
+
+        if (device != null) {
+            Log.i(TAG, "Found bonded device")
+            this.callback.onDeviceFound(device)
+        } else {
+            Log.i(TAG, "No bonded device, starting scanning")
+            bluetoothLeScanner.startScan(
+                mutableListOf<ScanFilter>(lampScanFilter),
+                ScanSettings.Builder().build(),
+                scanCallback
+            )
+        }
     }
 
     fun stop() {
