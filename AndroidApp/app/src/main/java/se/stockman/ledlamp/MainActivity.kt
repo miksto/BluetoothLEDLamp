@@ -1,8 +1,7 @@
 package se.stockman.ledlamp
 
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.le.*
+import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -12,15 +11,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.PermissionChecker
 import kotlinx.android.synthetic.main.content_main.*
 
-
-const val LAMP_SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-const val LAMP_COLOR_CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
-const val BLE_DEVICE_MAC = "30:AE:A4:CA:DE:76"
 const val TAG = "ScanDeviceActivity"
 
 class MainActivity : AppCompatActivity() {
 
     val handler = Handler()
+
 
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onConnectionStateChange(connected: Boolean) {
@@ -38,28 +34,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var ledLamp: LedLamp = LedLamp(lampCallback)
-
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult?) {
-            Log.d(TAG, "onScanResult(): ${result?.device?.address} - ${result?.device?.name}")
-            bluetoothLeScanner.stopScan(this)
+    private val lampDeviceFoundCallback = object : LampDeviceDiscovery.Callback {
+        override fun onDeviceFound(device: BluetoothDevice) {
+            lampFinder.stop()
             if (ledLamp.hasNoDevice()) {
-                result?.device?.let {
-                    ledLamp.connectToDevice(it, this@MainActivity)
-                }
+                ledLamp.connectToDevice(device, this@MainActivity)
             }
         }
     }
 
-    private val lampScanFilter =
-        ScanFilter.Builder().setDeviceAddress(BLE_DEVICE_MAC).build()
-
-    private val bluetoothLeScanner: BluetoothLeScanner
-        get() {
-            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            return bluetoothAdapter.bluetoothLeScanner
-        }
+    private val lampFinder: LampDeviceDiscovery = LampDeviceDiscovery(lampDeviceFoundCallback)
+    private var ledLamp: LedLamp = LedLamp(lampCallback)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,11 +94,7 @@ class MainActivity : AppCompatActivity() {
     private fun connectToLampIfNecessary() {
         if (ledLamp.hasNoDevice()) {
             Log.i(TAG, "Start Scan")
-            bluetoothLeScanner.startScan(
-                mutableListOf<ScanFilter>(lampScanFilter),
-                ScanSettings.Builder().build(),
-                scanCallback
-            )
+            lampFinder.findDevice()
         } else if (ledLamp.hasDeviceButDisconnected()) {
             ledLamp.resumeConnection()
         }
@@ -128,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             1 -> when (grantResults) {
                 intArrayOf(PackageManager.PERMISSION_GRANTED) -> {
                     Log.d("ScanDeviceActivity", "onRequestPermissionsResult(PERMISSION_GRANTED)")
-                    bluetoothLeScanner.startScan(scanCallback)
+                    lampFinder.findDevice()
                 }
                 else -> {
                     Log.d(
@@ -144,7 +125,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         Log.d("ScanDeviceActivity", "onStop()")
         super.onStop()
-        bluetoothLeScanner.stopScan(scanCallback)
+        lampFinder.stop();
         ledLamp.disconnect()
     }
 
