@@ -1,17 +1,16 @@
 package se.stockman.ledlamp
 
 import android.Manifest
-import android.bluetooth.*
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.*
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.PermissionChecker
 import kotlinx.android.synthetic.main.content_main.*
-import java.util.*
 
 
 const val LAMP_SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
@@ -21,80 +20,35 @@ const val TAG = "ScanDeviceActivity"
 
 class MainActivity : AppCompatActivity() {
 
+    val handler = Handler()
 
-    private var gatt: BluetoothGatt? = null
-
-    private val gattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            when (newState) {
-                BluetoothProfile.STATE_CONNECTED -> {
-                    Log.i(TAG, "Connected to GATT server.")
-                    Log.i(TAG, "Attempting to start service discovery: " + gatt?.discoverServices())
-                }
-                BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.i(TAG, "Disconnected from GATT server.")
-                }
+    private val lampCallback = object : LedLamp.LampCallback {
+        override fun onConnectionStateChange(connected: Boolean) {
+            handler.post {
+                hue_seek_bar.isEnabled = connected
+                saturation_seek_bar.isEnabled = connected
+                lightness_seek_bar.isEnabled = connected
             }
         }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            when (status) {
-                BluetoothGatt.GATT_SUCCESS -> readCurrentColor()
-                else -> Log.w(TAG, "onServicesDiscovered received: $status")
-            }
+        override fun onColorChanged(color: HlsColor) {
+            hue_seek_bar.progress = color.hue
+            saturation_seek_bar.progress = color.saturation
+            lightness_seek_bar.progress = color.lightness
         }
-
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            if (characteristic?.value != null) {
-                val data = characteristic.value
-                val brightness = data[0].toUByte().toInt()
-                val saturation = data[1].toUByte().toInt()
-                val hue = (data[3].toUByte().toInt() shl 8) or data[2].toUByte().toInt()
-
-                hue_seek_bar.progress = hue
-                saturation_seek_bar.progress = saturation
-                brightness_seek_bar.progress = brightness
-            }
-        }
-
     }
 
-    private fun readCurrentColor() {
-        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
-        val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
-
-        gatt?.readCharacteristic(characteristic)
-
-    }
-
-    private fun setColor(
-        gatt: BluetoothGatt?,
-        color: Int,
-        saturation: Int,
-        brightness: Int
-    ) {
-        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
-        val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
-
-
-        val data = (((color shl 8) or saturation) shl 8) or brightness
-
-        characteristic?.setValue(data, BluetoothGattCharacteristic.FORMAT_UINT32, 0)
-        gatt?.writeCharacteristic(characteristic)
-
-    }
+    private var ledLamp: LedLamp = LedLamp(lampCallback)
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             Log.d(TAG, "onScanResult(): ${result?.device?.address} - ${result?.device?.name}")
             bluetoothLeScanner.stopScan(this)
-            gatt = result?.device?.connectGatt(this@MainActivity, false, gattCallback)
+            if (ledLamp.hasNoDevice()) {
+                result?.device?.let {
+                    ledLamp.connectToDevice(it, this@MainActivity)
+                }
+            }
         }
     }
 
@@ -103,9 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     private val bluetoothLeScanner: BluetoothLeScanner
         get() {
-            val bluetoothManager =
-                applicationContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-            val bluetoothAdapter = bluetoothManager.adapter
+            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             return bluetoothAdapter.bluetoothLeScanner
         }
 
@@ -125,18 +77,22 @@ class MainActivity : AppCompatActivity() {
 
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 // Display the current progress of SeekBar
-                setColor(
-                    gatt,
+                val color = HlsColor(
                     hue_seek_bar.progress,
                     saturation_seek_bar.progress,
-                    brightness_seek_bar.progress
-                );
+                    lightness_seek_bar.progress
+                )
+                ledLamp.setColor(color)
             }
         }
 
         hue_seek_bar.setOnSeekBarChangeListener(seekbarListener)
         saturation_seek_bar.setOnSeekBarChangeListener(seekbarListener)
-        brightness_seek_bar.setOnSeekBarChangeListener(seekbarListener)
+        lightness_seek_bar.setOnSeekBarChangeListener(seekbarListener)
+
+        hue_seek_bar.isEnabled = false
+        saturation_seek_bar.isEnabled = false
+        lightness_seek_bar.isEnabled = false
     }
 
     override fun onStart() {
@@ -151,15 +107,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun connectToLampIfNecessary() {
-        if (gatt == null) {
+        if (ledLamp.hasNoDevice()) {
             Log.i(TAG, "Start Scan")
             bluetoothLeScanner.startScan(
                 mutableListOf<ScanFilter>(lampScanFilter),
                 ScanSettings.Builder().build(),
                 scanCallback
             )
-        } else {
-            gatt?.connect()
+        } else if (ledLamp.hasDeviceButDisconnected()) {
+            ledLamp.resumeConnection()
         }
     }
 
@@ -189,13 +145,12 @@ class MainActivity : AppCompatActivity() {
         Log.d("ScanDeviceActivity", "onStop()")
         super.onStop()
         bluetoothLeScanner.stopScan(scanCallback)
-        gatt?.disconnect();
+        ledLamp.disconnect()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        gatt?.close()
-        gatt = null
+        ledLamp.destroy()
     }
 
 }
