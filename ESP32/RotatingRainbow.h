@@ -9,6 +9,7 @@ class RotatingRainbow: public LampEffect {
     RotatingRainbow(LedStrip* strip);
     virtual void setup();
     virtual void next();
+    virtual uint8_t* toBytes();
 };
 
 #endif

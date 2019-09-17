@@ -5,13 +5,20 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <BLEUUID.h>
 
-#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID_COLOR "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+namespace LampBLEUUID
+{
+const BLEUUID service("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
+const BLEUUID characteristic_color("beb5483e-36e1-4688-b7f5-ea07361b26a8");
+const BLEUUID characteristic_notification_alert("32e2d7c0-1c54-419f-945b-587ffef47e9c");
+}
 
 class LampBLEServerCallbacks {
   public:
-    virtual void onSetColor(HslColor color);
+    virtual void onSetHslColor(HslColor color);
+    virtual void onSetRgbColor(RgbColor color);
+    virtual void onNotificationAlert();
 };
 
 class LampBLEServer {
@@ -19,10 +26,11 @@ class LampBLEServer {
     BLEServer* server;
     BLEService* service;
     BLECharacteristic* colorCharacteristic;
+    BLECharacteristic* notificationCharacteristic;
 
   public:
     void setup();
     void setCallbacks(LampBLEServerCallbacks* callbacks);
-    void setColorCharacteristic(HslColor color);
+    void setColorCharacteristicValue(RgbColor color);
 };
 #endif

@@ -2,7 +2,7 @@
 #include "LedStrip.h"
 #include <NeoPixelBus.h>
 
-RotatingRainbow::RotatingRainbow(LedStrip* strip) : LampEffect(strip) {
+RotatingRainbow::RotatingRainbow(LedStrip* strip) : LampEffect(strip, LampEffectId::rotating_rainbow, LampEffectEepromDataSize::rotating_rainbow) {
 
 }
 
@@ -19,3 +19,5 @@ void RotatingRainbow::next() {
   strip->Show();
   delay(40);
 }
+
+uint8_t* RotatingRainbow::toBytes() { return nullptr; }

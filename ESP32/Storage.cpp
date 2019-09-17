@@ -1,10 +1,15 @@
 #include "Storage.h"
 #include "ColorUtils.h"
+#include "LedStrip.h"
 
 #include <EEPROM.h>
 
-#define ADDR_COLOR 0
-#define EEPROM_SIZE 4
+#define ADDR_EFFECT_ID 0
+#define ADDR_DATA 1
+
+#define ADDR_LAST_COLOR = 10
+
+#define EEPROM_SIZE 20
 
 
 namespace Storage
@@ -14,21 +19,46 @@ void init() {
   EEPROM.begin(EEPROM_SIZE);
 }
 
-void saveColor(HslColor hsl) {
-  uint8_t* bytes = ColorUtils::hslColorToBytes(hsl);
-  for (int i = 0; i < COLOR_BYTES_LENGTH; i++) {
-    EEPROM.write(ADDR_COLOR + i, bytes[i]);
+void saveEffect(LampEffect* effect) {
+  Serial.println("Saving effect");
+  EEPROM.write(ADDR_EFFECT_ID, effect->id);
+
+  if (effect->eepromDataSize > 0) {
+    uint8_t* bytes = effect->toBytes();
+    for (int i = 0; i < effect->eepromDataSize; i++) {
+      EEPROM.write(ADDR_DATA + i, bytes[i]);
+    }
   }
   EEPROM.commit();
 }
 
-HslColor loadColor() {
-  uint8_t* bytes = new uint8_t[COLOR_BYTES_LENGTH];
+LampEffect* loadEffect(LedStrip* strip) {
+  Serial.println("Loading effect");
+  uint8_t effectId = EEPROM.read(ADDR_EFFECT_ID);
+  uint8_t eepromDataSize = LampEffect::dataSizeForEffectId(effectId);
 
-  for (int i = 0; i < COLOR_BYTES_LENGTH; i++) {
-    bytes[i] = EEPROM.read(ADDR_COLOR + i);
+  uint8_t* bytes;
+  if (eepromDataSize > 0) {
+    bytes = new uint8_t[eepromDataSize];
+    
+    for (int i = 0; i < eepromDataSize; i++) {
+      bytes[i] = EEPROM.read(ADDR_DATA + i);
+    }
+  } else {
+    bytes = nullptr;
   }
-  HslColor color = ColorUtils::bytesToHslColor(bytes);
-  return color;
+
+  LampEffect* lampEffect = LampEffect::createEffect(strip, effectId, bytes, eepromDataSize);
+  delete bytes;
+  return lampEffect;
 }
+
+void saveStaticColorEffect(StaticColor* effect) {
+  saveEffect(effect);
+}
+
+StaticColor* loadStaticColorEffect(LedStrip* strip) {
+  return (StaticColor*) loadEffect(strip);
+}
+
 };

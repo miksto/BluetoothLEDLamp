@@ -2,7 +2,7 @@
 #include "LedStrip.h"
 
 
-RotatingLines::RotatingLines(LedStrip* strip) : LampEffect(strip) {
+RotatingLines::RotatingLines(LedStrip* strip) : LampEffect(strip, LampEffectId::rotating_lines, LampEffectEepromDataSize::rotating_lines) {
 
 }
 
@@ -26,3 +26,5 @@ void RotatingLines::next() {
   strip->Show();
   delay(100);
 }
+
+uint8_t* RotatingLines::toBytes() { return nullptr; }

@@ -6,8 +6,8 @@ typedef NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> LedStrip;
 
 namespace LedStripConstants
 {
-const int led_io_pin = 14;
-const int led_count = 117;
+const uint8_t led_io_pin = 14;
+const uint8_t led_count = 116;
 };
 
 #endif

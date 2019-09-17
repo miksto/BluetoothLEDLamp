@@ -2,7 +2,7 @@
 #include "LedStrip.h"
 
 
-BeaconLight::BeaconLight(LedStrip* strip) : LampEffect(strip) {
+BeaconLight::BeaconLight(LedStrip* strip) : LampEffect(strip, LampEffectId::beacon_light, LampEffectEepromDataSize::beacon_light) {
 
 }
 
@@ -53,3 +53,5 @@ void BeaconLight::next() {
   displayArray();
   delay(50);
 }
+
+uint8_t* BeaconLight::toBytes() { return nullptr; }

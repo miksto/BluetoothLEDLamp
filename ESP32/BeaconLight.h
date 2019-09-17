@@ -17,6 +17,7 @@ class BeaconLight: public LampEffect {
     BeaconLight(LedStrip* strip);
     virtual void setup();
     virtual void next();
+    virtual uint8_t* toBytes();
 };
 
 #endif

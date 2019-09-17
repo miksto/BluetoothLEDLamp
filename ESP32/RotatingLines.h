@@ -9,6 +9,7 @@ class RotatingLines: public LampEffect {
     RotatingLines(LedStrip* strip);
     virtual void setup();
     virtual void next();
+    virtual uint8_t* toBytes();
 };
 
 #endif

@@ -2,7 +2,7 @@
 #include "LedStrip.h"
 
 
-ColorLoop::ColorLoop(LedStrip* strip) : LampEffect(strip) {
+ColorLoop::ColorLoop(LedStrip* strip) : LampEffect(strip, LampEffectId::color_loop, 0) {
 
 }
 
@@ -21,3 +21,5 @@ void ColorLoop::next() {
   strip->Show();
   delay(50);
 }
+
+uint8_t* ColorLoop::toBytes() { return nullptr; }

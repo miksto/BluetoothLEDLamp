@@ -6,28 +6,36 @@
 #include "LedStrip.h"
 #include "RotatingLines.h"
 #include "RotatingRainbow.h"
+#include "BeaconLight.h"
+#include "StaticColor.h"
+
 #include "ColorLoop.h"
 #include "LampEffect.h"
 
 LedStrip strip(LedStripConstants::led_count, LedStripConstants::led_io_pin);
 LampBLEServer lampServer;
-LampEffect* effect = new ColorLoop(&strip);
 
-enum class Mode {effect, static_color};
-Mode current_mode = Mode::effect;
+//Has to be pointer to support polymorphism
+LampEffect* effect;
+StaticColor* staticColorEffect;
 
-HslColor* newColor = nullptr;
+boolean isDirty = false;
 unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 1000;
 
-void displayColor(HslColor color) {
-  RgbwColor rgbwColor = ColorUtils::hslToRgbw(color);
-  strip.ClearTo(rgbwColor);
-  strip.Show();
+bool pendingAlert = false;
+
+void displayColor(RgbColor color) {
+  Log::logColor("ESP32", color);
+  delete effect;
+  staticColorEffect = new StaticColor(&strip, color);
+  effect = staticColorEffect;
+  effect->setup();
 }
 
-void flashOn(RgbwColor color) {
+void notificationAlert() {
   RgbwColor black(0, 0, 0, 0);
+  RgbwColor color(0, 0, 0, 80);
   int blink_delay = 150;
   strip.ClearTo(black);
   strip.Show();
@@ -51,11 +59,21 @@ void flashOn(RgbwColor color) {
 }
 
 class LampCallbacks: public LampBLEServerCallbacks {
-    void onSetColor(HslColor color) {
-      current_mode = Mode::static_color;
-      displayColor(color);
-      newColor = new HslColor(color.H, color.S, color.L);
+    void onSetHslColor(HslColor color) {
+      RgbColor rgbColor(color);
+      displayColor(rgbColor);
       lastDebounceTime = millis();
+      isDirty = true;
+    }
+
+    void onSetRgbColor(RgbColor color) {
+      displayColor(color);
+      lastDebounceTime = millis();
+      isDirty = true;
+    }
+
+    void onNotificationAlert() {
+      pendingAlert = true;
     }
 };
 
@@ -63,24 +81,31 @@ void setup() {
   Serial.begin(115200);
   Storage::init();
   strip.Begin();
-  HslColor color = Storage::loadColor();
-  flashOn(color);
-  Log::logColor("StoredColor", color);
-  displayColor(color);
+  
   lampServer.setup();
   lampServer.setCallbacks(new LampCallbacks());
-  lampServer.setColorCharacteristic(color);
+
+  notificationAlert();
+  StaticColor* staticColor = Storage::loadStaticColorEffect(&strip);
+  effect = staticColor;
   effect->setup();
+
+  lampServer.setColorCharacteristicValue(staticColor->color);
 }
 
 void loop() {
-  if (current_mode == Mode::effect) {
-    effect->next();
+  if (pendingAlert) {
+    notificationAlert();
+    effect->setup();
+    pendingAlert = false;
   }
-  if (newColor != NULL) {
+  
+  effect->next();
+
+  if (isDirty) {
     if ((millis() - lastDebounceTime) > debounceDelay) {
-      Storage::saveColor(*newColor);
-      newColor = NULL;
+      Storage::saveStaticColorEffect(staticColorEffect);
+      isDirty = false;
     }
   }
 }
