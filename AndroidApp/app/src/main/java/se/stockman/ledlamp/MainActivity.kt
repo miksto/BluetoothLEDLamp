@@ -90,6 +90,10 @@ class MainActivity : AppCompatActivity() {
         seekbar_color_green.isEnabled = false
         seekbar_color_blue.isEnabled = false
         seekbar_brighness.isEnabled = false
+
+        debug_button.setOnClickListener {
+            ledLamp.callDebugFunction()
+        }
     }
 
     override fun onStart() {

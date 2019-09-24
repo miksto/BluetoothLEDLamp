@@ -78,6 +78,13 @@ class LampCallbacks: public LampBLEServerCallbacks {
     void onNotificationAlert() {
       pendingAlert = true;
     }
+
+    void debugButtonPress() {
+      ColorLoop* rainbow = new ColorLoop(&strip);
+      effect = rainbow;
+      effect->setup();
+      setDirty();
+    }
 };
 
 void setup() {

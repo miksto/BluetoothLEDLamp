@@ -47,6 +47,21 @@ class NotificationAlertCallback: public BLECharacteristicCallbacks {
     }
 };
 
+
+class DebugButtonCallback: public BLECharacteristicCallbacks {
+  private:
+    LampBLEServerCallbacks* lampCallbacks;
+
+  public:
+    DebugButtonCallback(LampBLEServerCallbacks* lampCallbacks) {
+      this->lampCallbacks = lampCallbacks;
+    }
+
+    void onWrite(BLECharacteristic *pCharacteristic) {
+        lampCallbacks->debugButtonPress();
+    }
+};
+
 void LampBLEServer::setup() {
   BLEDevice::init("LedLAMP");
   this->server = BLEDevice::createServer();
@@ -65,6 +80,12 @@ void LampBLEServer::setup() {
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
 
+   this->debugButtonCharacteristic = this->service->createCharacteristic(
+                                         LampBLEUUID::characteristic_debug,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+
 
   this->service->start();
   BLEAdvertising *advertising = this->server->getAdvertising();
@@ -79,4 +100,5 @@ void LampBLEServer::setColorCharacteristicValue(RgbColor color) {
 void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks) {
   this->colorCharacteristic->setCallbacks(new RgbColorCallback(callbacks));
   this->notificationCharacteristic->setCallbacks(new NotificationAlertCallback(callbacks));
+  this->debugButtonCharacteristic->setCallbacks(new DebugButtonCallback(callbacks));
 }

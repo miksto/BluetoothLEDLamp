@@ -17,6 +17,7 @@ import java.util.*
 const val LAMP_SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 const val LAMP_COLOR_CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 const val LAMP_NOTIFICATION_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-587ffef47e9c"
+const val LAMP_DEBUG_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-777ffef47e9c"
 
 class LedLamp(private val context: Context, private val callback: LampCallback) {
     companion object {
@@ -168,5 +169,15 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                 gatt?.writeCharacteristic(characteristic)
             }
         }
+    }
+
+    fun callDebugFunction() {
+
+        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+        val characteristic =
+            service?.getCharacteristic(UUID.fromString(LAMP_DEBUG_CHARACTERISTIC_UUID))
+
+        characteristic?.setValue("1")
+        gatt?.writeCharacteristic(characteristic)
     }
 }

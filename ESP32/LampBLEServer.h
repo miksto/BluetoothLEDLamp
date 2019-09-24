@@ -12,6 +12,7 @@ namespace LampBLEUUID
 const BLEUUID service("4fafc201-1fb5-459e-8fcc-c5c9c331914b");
 const BLEUUID characteristic_color("beb5483e-36e1-4688-b7f5-ea07361b26a8");
 const BLEUUID characteristic_notification_alert("32e2d7c0-1c54-419f-945b-587ffef47e9c");
+const BLEUUID characteristic_debug("32e2d7c0-1c54-419f-945b-777ffef47e9c");
 }
 
 class LampBLEServerCallbacks {
@@ -19,6 +20,7 @@ class LampBLEServerCallbacks {
     virtual void onSetHslColor(HslColor color);
     virtual void onSetRgbColor(RgbColor color);
     virtual void onNotificationAlert();
+    virtual void debugButtonPress();
 };
 
 class LampBLEServer {
@@ -27,6 +29,7 @@ class LampBLEServer {
     BLEService* service;
     BLECharacteristic* colorCharacteristic;
     BLECharacteristic* notificationCharacteristic;
+    BLECharacteristic* debugButtonCharacteristic;
 
   public:
     void setup();
