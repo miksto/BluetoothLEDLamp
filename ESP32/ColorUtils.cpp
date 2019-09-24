@@ -46,7 +46,7 @@ uint8_t* rgbColorToBytes(RgbColor color) {
   uint8_t *bytes = new uint8_t[RGB_COLOR_BYTES_LENGTH];
   bytes[0] = color.R;
   bytes[1] = color.G;
-  bytes[3] = color.B;
+  bytes[2] = color.B;
   return bytes;
 }
 };
