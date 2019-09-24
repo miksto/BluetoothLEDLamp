@@ -58,18 +58,21 @@ void notificationAlert() {
   delay(blink_delay);
 }
 
+void setDirty() {
+  lastDebounceTime = millis();
+  isDirty = true;
+}
+
 class LampCallbacks: public LampBLEServerCallbacks {
     void onSetHslColor(HslColor color) {
       RgbColor rgbColor(color);
       displayColor(rgbColor);
-      lastDebounceTime = millis();
-      isDirty = true;
+      setDirty();
     }
 
     void onSetRgbColor(RgbColor color) {
       displayColor(color);
-      lastDebounceTime = millis();
-      isDirty = true;
+      setDirty();
     }
 
     void onNotificationAlert() {
@@ -87,9 +90,17 @@ void setup() {
 
   notificationAlert();
   StaticColor* staticColor = Storage::loadStaticColorEffect(&strip);
-  effect = staticColor;
-  effect->setup();
+  if (staticColor == nullptr) {
+    RgbColor color(100, 100, 100);
+    staticColor = new StaticColor(&strip, color);
+  }
 
+  effect = Storage::loadEffect(&strip);
+  if (effect == nullptr) {
+    effect = staticColor;
+  }
+  
+  effect->setup();
   lampServer.setColorCharacteristicValue(staticColor->color);
 }
 
@@ -105,6 +116,7 @@ void loop() {
   if (isDirty) {
     if ((millis() - lastDebounceTime) > debounceDelay) {
       Storage::saveStaticColorEffect(staticColorEffect);
+      Storage::saveEffect(effect);
       isDirty = false;
     }
   }

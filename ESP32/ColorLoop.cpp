@@ -2,7 +2,7 @@
 #include "LedStrip.h"
 
 
-ColorLoop::ColorLoop(LedStrip* strip) : LampEffect(strip, LampEffectId::color_loop, 0) {
+ColorLoop::ColorLoop(LedStrip* strip) : LampEffect(strip, LampEffectId::color_loop, LampEffectEepromDataSize::color_loop) {
 
 }
 
