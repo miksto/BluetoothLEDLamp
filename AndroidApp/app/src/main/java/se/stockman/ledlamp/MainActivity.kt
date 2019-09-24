@@ -8,58 +8,38 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
 import android.util.Log
-import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
-import kotlinx.android.synthetic.main.content_main.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ColorFragment.OnFragmentInteractionListener, AppCompatActivity() {
+
+    val colorFragment = ColorFragment.newInstance()
+
+    override fun onSetColor(color: RgbColor) {
+        ledLamp.setColor(color)
+    }
+
+    override fun onDebugButtonPressed() {
+        ledLamp.callDebugFunction()
+    }
+
+
     companion object {
         val TAG: String? = MainActivity::class.simpleName
     }
 
     val handler = Handler()
 
-    val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
-
-        override fun onStartTrackingTouch(p0: SeekBar?) {
-
-        }
-
-        override fun onStopTrackingTouch(p0: SeekBar?) {
-
-        }
-
-        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-            // Display the current progress of SeekBar
-            val brightnessFactor = seekbar_brighness.progress / 100f
-
-            val color = RgbColor(
-                (seekbar_color_red.progress * brightnessFactor).toInt(),
-                (seekbar_color_green.progress * brightnessFactor).toInt(),
-                (seekbar_color_blue.progress * brightnessFactor).toInt()
-            )
-            ledLamp.setColor(color)
-        }
-    }
 
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onConnectionStateChange(connected: Boolean) {
-            handler.post {
-                seekbar_color_red.isEnabled = connected
-                seekbar_color_green.isEnabled = connected
-                seekbar_color_blue.isEnabled = connected
-                seekbar_brighness.isEnabled = connected
-            }
+            colorFragment.onConnectionStateChange(connected)
         }
 
         override fun onColorChanged(color: RgbColor) {
-            seekbar_color_red.progress = color.red
-            seekbar_color_green.progress = color.green
-            seekbar_color_blue.progress = color.blue
-            seekbar_brighness.progress = seekbar_brighness.max
+            colorFragment.setColor(color)
         }
     }
 
@@ -81,19 +61,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         startService(NotificationListener.createIntent(this))
 
-        seekbar_color_red.setOnSeekBarChangeListener(seekbarListener)
-        seekbar_color_green.setOnSeekBarChangeListener(seekbarListener)
-        seekbar_color_blue.setOnSeekBarChangeListener(seekbarListener)
-        seekbar_brighness.setOnSeekBarChangeListener(seekbarListener)
-
-        seekbar_color_red.isEnabled = false
-        seekbar_color_green.isEnabled = false
-        seekbar_color_blue.isEnabled = false
-        seekbar_brighness.isEnabled = false
-
-        debug_button.setOnClickListener {
-            ledLamp.callDebugFunction()
-        }
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, colorFragment)
+        transaction.commit()
     }
 
     override fun onStart() {
