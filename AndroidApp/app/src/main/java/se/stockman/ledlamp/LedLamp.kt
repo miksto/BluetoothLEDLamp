@@ -6,6 +6,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Handler
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.palette.graphics.Palette
 import se.stockman.ledlamp.data.HlsColorDataObject
 import se.stockman.ledlamp.data.RgbColorDataObject
@@ -148,12 +151,9 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             val drawable = sbn.notification.getLargeIcon().loadDrawable(context)
             val bitmap = (drawable as BitmapDrawable).bitmap
             val palette = Palette.from(bitmap).generate()
-            val hls = palette.dominantSwatch?.hsl
-            hls?.let {
-                val color =
-                    HlsColor((hls[0] * 182).toInt(),
-                        (hls[1] * 255).toInt(),
-                        (hls[2] * 255).toInt())
+            val rgb = palette.dominantSwatch?.rgb
+            rgb?.let {
+                val color = RgbColor(it.red, it.green, it.blue)
                 setColor(color)
             }
         } else {
