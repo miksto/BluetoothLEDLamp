@@ -17,5 +17,6 @@
     <string name="mood_sunset">Sunset</string>
     <string name="mood_woods">Woods</string>
     <string name="mood_sakura">Sakura</string>
+    <string name="status_connecting_to_lamp">Connecting to Lamp...</string>
 
 </resources>

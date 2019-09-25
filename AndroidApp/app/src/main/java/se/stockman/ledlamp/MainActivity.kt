@@ -5,12 +5,15 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_menu.*
 import se.stockman.ledlamp.color.ColorFragment
 import se.stockman.ledlamp.data.LampEffect
@@ -32,6 +35,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         ledLamp.setEffect(effect)
     }
 
+    private val handler = Handler()
     private val colorFragment = ColorFragment.newInstance()
     private val effectFragment = EffectFragment.newInstance()
     private val moodFragment = MoodFragment.newInstance()
@@ -59,6 +63,13 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onConnectionStateChange(connected: Boolean) {
+            handler.post {
+                if (connected) {
+                    loading_overlay.visibility = View.GONE
+                } else {
+                    loading_overlay.visibility = View.VISIBLE
+                }
+            }
             colorFragment.onConnectionStateChange(connected)
             effectFragment.onConnectionStateChange(connected)
             moodFragment.onConnectionStateChange(connected)
