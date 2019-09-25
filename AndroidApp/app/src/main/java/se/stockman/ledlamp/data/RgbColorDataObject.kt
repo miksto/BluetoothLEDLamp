@@ -1,7 +1,5 @@
 package se.stockman.ledlamp.data
 
-import se.stockman.ledlamp.RgbColor
-
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */

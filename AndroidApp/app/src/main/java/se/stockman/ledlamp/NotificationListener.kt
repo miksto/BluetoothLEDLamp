@@ -6,6 +6,7 @@ import android.content.Intent
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import se.stockman.ledlamp.data.RgbColor
 
 /**
  * Created by Mikael Stockman on 2019-09-07.

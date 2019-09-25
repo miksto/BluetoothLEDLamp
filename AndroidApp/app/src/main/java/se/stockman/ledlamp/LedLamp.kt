@@ -10,6 +10,8 @@ import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.palette.graphics.Palette
+import se.stockman.ledlamp.data.HlsColor
+import se.stockman.ledlamp.data.RgbColor
 import se.stockman.ledlamp.data.HlsColorDataObject
 import se.stockman.ledlamp.data.LampEffect
 import se.stockman.ledlamp.data.RgbColorDataObject

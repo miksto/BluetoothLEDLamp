@@ -14,4 +14,8 @@
     <string name="title_blue">Blue</string>
     <string name="title_brightness">Brightness</string>
 
+    <string name="mood_sunset">Sunset</string>
+    <string name="mood_woods">Woods</string>
+    <string name="mood_sakura">Sakura</string>
+
 </resources>

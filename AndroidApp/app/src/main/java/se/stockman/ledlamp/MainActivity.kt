@@ -12,12 +12,21 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.bottom_menu.*
+import se.stockman.ledlamp.color.ColorFragment
 import se.stockman.ledlamp.data.LampEffect
+import se.stockman.ledlamp.data.RgbColor
 import se.stockman.ledlamp.effect.EffectFragment
+import se.stockman.ledlamp.mood.MoodFragment
 
 
 class MainActivity : ColorFragment.OnFragmentInteractionListener,
-    EffectFragment.OnEffectSelectedListener, AppCompatActivity() {
+    EffectFragment.OnEffectSelectedListener, MoodFragment.OnMoodSelectedListener,
+    AppCompatActivity() {
+    override fun onMoodSelected(effectId: Int) {
+        val effect = LampEffect.fromId(effectId)
+        ledLamp.setEffect(effect)
+    }
+
     override fun onEffectSelected(effectId: Int) {
         val effect = LampEffect.fromId(effectId)
         ledLamp.setEffect(effect)
@@ -25,6 +34,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     private val colorFragment = ColorFragment.newInstance()
     private val effectFragment = EffectFragment.newInstance()
+    private val moodFragment = MoodFragment.newInstance()
 
     private fun setFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
@@ -50,6 +60,8 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onConnectionStateChange(connected: Boolean) {
             colorFragment.onConnectionStateChange(connected)
+            effectFragment.onConnectionStateChange(connected)
+            moodFragment.onConnectionStateChange(connected)
         }
 
         override fun onColorChanged(color: RgbColor) {
@@ -78,7 +90,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         setFragment(colorFragment)
         menu_color_picker.setOnClickListener { setFragment(colorFragment) }
         menu_effect_picker.setOnClickListener { setFragment(effectFragment) }
-        menu_mood_picker.setOnClickListener { setFragment(colorFragment) }
+        menu_mood_picker.setOnClickListener { setFragment(moodFragment) }
     }
 
     override fun onStart() {

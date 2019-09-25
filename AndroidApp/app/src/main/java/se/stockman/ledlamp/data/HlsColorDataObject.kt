@@ -1,7 +1,5 @@
 package se.stockman.ledlamp.data
 
-import se.stockman.ledlamp.HlsColor
-
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */
@@ -12,7 +10,13 @@ class HlsColorDataObject(val color: HlsColor) : DataObject {
             val lightness = byteArray[0].toUByte().toInt()
             val saturation = byteArray[1].toUByte().toInt()
             val hue = (byteArray[3].toUByte().toInt() shl 8) or byteArray[2].toUByte().toInt()
-            return HlsColorDataObject(HlsColor(hue, saturation, lightness))
+            return HlsColorDataObject(
+                HlsColor(
+                    hue,
+                    saturation,
+                    lightness
+                )
+            )
         }
     }
 

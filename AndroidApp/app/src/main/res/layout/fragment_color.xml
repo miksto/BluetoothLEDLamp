@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
-    tools:context=".ColorFragment"
+    tools:context=".color.ColorFragment"
     tools:showIn="@layout/activity_main">
 
     <TextView

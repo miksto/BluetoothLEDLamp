@@ -1,4 +1,4 @@
-package se.stockman.ledlamp
+package se.stockman.ledlamp.color
 
 import android.content.Context
 import android.os.Bundle
@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import kotlinx.android.synthetic.main.fragment_color.*
+import se.stockman.ledlamp.BaseFragment
+import se.stockman.ledlamp.R
+import se.stockman.ledlamp.data.RgbColor
 
 class ColorFragment : BaseFragment() {
     var currentColor: RgbColor? = null
