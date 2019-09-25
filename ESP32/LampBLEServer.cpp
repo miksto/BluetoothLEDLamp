@@ -1,5 +1,7 @@
 #include "LampBLEServer.h"
 #include "ColorUtils.h"
+#include "LedStrip.h"
+#include "Log.h"
 
 class HslColorCallback: public BLECharacteristicCallbacks {
   private:
@@ -17,19 +19,21 @@ class HslColorCallback: public BLECharacteristicCallbacks {
     }
 };
 
-class RgbColorCallback: public BLECharacteristicCallbacks {
+class EffectCallback: public BLECharacteristicCallbacks {
   private:
     LampBLEServerCallbacks* lampCallbacks;
+    LedStrip* strip;
 
   public:
-    RgbColorCallback(LampBLEServerCallbacks* lampCallbacks) {
+    EffectCallback(LampBLEServerCallbacks* lampCallbacks, LedStrip* strip) {
       this->lampCallbacks = lampCallbacks;
+      this->strip = strip;
     }
 
     void onWrite(BLECharacteristic *pCharacteristic) {
-        uint8_t* data = pCharacteristic->getData();
-        RgbColor color = ColorUtils::bytesToRgbColor(data);
-        lampCallbacks->onSetRgbColor(color);
+        uint8_t* bytes = pCharacteristic->getData();
+        LampEffect* effect = LampEffect::createEffect(this->strip, bytes);
+        lampCallbacks->onSetEffect(effect);
     }
 };
 
@@ -70,19 +74,22 @@ void LampBLEServer::setup() {
   
   this->notificationCharacteristic = this->service->createCharacteristic(
                                          LampBLEUUID::characteristic_notification_alert,
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+
+  this->effectCharacteristic = this->service->createCharacteristic(
+                                         LampBLEUUID::characteristic_effect,
                                          BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
 
-  this->colorCharacteristic = this->service->createCharacteristic(
-                                         LampBLEUUID::characteristic_color,
-                                         BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE
+  this->staticColorCharacteristic = this->service->createCharacteristic(
+                                         LampBLEUUID::characteristic_static_color,
+                                         BLECharacteristic::PROPERTY_READ
                                        );
 
    this->debugButtonCharacteristic = this->service->createCharacteristic(
                                          LampBLEUUID::characteristic_debug,
-                                         BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
 
@@ -93,12 +100,13 @@ void LampBLEServer::setup() {
 }
 
 void LampBLEServer::setColorCharacteristicValue(RgbColor color) {
+  Log::logColor("Setting characteristic value: ",color);
   uint8_t* data = ColorUtils::rgbColorToBytes(color);
-  colorCharacteristic->setValue(data, RGB_COLOR_BYTES_LENGTH);
+  this->staticColorCharacteristic->setValue(data, RGB_COLOR_BYTES_LENGTH);
 }
 
-void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks) {
-  this->colorCharacteristic->setCallbacks(new RgbColorCallback(callbacks));
+void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks, LedStrip* strip) {
+  this->effectCharacteristic->setCallbacks(new EffectCallback(callbacks, strip));
   this->notificationCharacteristic->setCallbacks(new NotificationAlertCallback(callbacks));
   this->debugButtonCharacteristic->setCallbacks(new DebugButtonCallback(callbacks));
 }

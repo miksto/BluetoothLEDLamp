@@ -17,6 +17,7 @@ LampBLEServer lampServer;
 
 //Has to be pointer to support polymorphism
 LampEffect* effect;
+LampEffect* effect2;
 StaticColor* staticColorEffect;
 
 boolean isDirty = false;
@@ -70,8 +71,12 @@ class LampCallbacks: public LampBLEServerCallbacks {
       setDirty();
     }
 
-    void onSetRgbColor(RgbColor color) {
-      displayColor(color);
+    void onSetEffect(LampEffect* newEffect) {
+      if (effect->id == LampEffectId::static_color) {
+        staticColorEffect = (StaticColor*) newEffect;
+      }
+      effect = newEffect;
+      effect->setup();
       setDirty();
     }
 
@@ -93,7 +98,7 @@ void setup() {
   strip.Begin();
   
   lampServer.setup();
-  lampServer.setCallbacks(new LampCallbacks());
+  lampServer.setCallbacks(new LampCallbacks(), &strip);
 
   notificationAlert();
   StaticColor* staticColor = Storage::loadStaticColorEffect(&strip);

@@ -29,7 +29,7 @@ class LampEffect {
     LampEffect(LedStrip* the_strip, int id, int eepromDataSize)
       : strip(the_strip), id(id), eepromDataSize(eepromDataSize) {
     }
-    static LampEffect* createEffect(LedStrip* strip, uint8_t effectId, uint8_t* bytes, uint8_t dataSize);
+    static LampEffect* createEffect(LedStrip* strip, uint8_t* bytes);
     static uint8_t dataSizeForEffectId(uint8_t effectId);
 
     virtual void setup() = 0;

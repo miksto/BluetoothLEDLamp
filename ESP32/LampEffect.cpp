@@ -5,9 +5,22 @@
 #include "RotatingLines.h"
 #include "RotatingRainbow.h"
 
-LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t effectId, uint8_t* bytes, uint8_t dataSize) {
+LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
+  uint8_t effectId = bytes[0];
+  uint8_t dataSize = dataSizeForEffectId(effectId);
+  uint8_t* effectData;
+
+  if (dataSize > 0) {
+    effectData = &bytes[1];
+  } else {
+    effectData = nullptr;
+  }
+  
+  Serial.print("Effect Id:");
+  Serial.println(effectId);
+
   switch (effectId) {
-    case LampEffectId::static_color: return StaticColor::fromBytes(strip, effectId, bytes, dataSize);
+    case LampEffectId::static_color: return StaticColor::fromBytes(strip, effectData);
 
     case LampEffectId::beacon_light: return new BeaconLight(strip);
 
@@ -17,6 +30,8 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t effectId, uint8_t*
 
     case LampEffectId::rotating_rainbow: return new RotatingRainbow(strip);
   }
+  Serial.print("Invalid effectId: ");
+  Serial.println(effectId);
 }
 
 uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {

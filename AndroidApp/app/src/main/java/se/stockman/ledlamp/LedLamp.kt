@@ -11,6 +11,7 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.palette.graphics.Palette
 import se.stockman.ledlamp.data.HlsColorDataObject
+import se.stockman.ledlamp.data.LampEffect
 import se.stockman.ledlamp.data.RgbColorDataObject
 import java.util.*
 
@@ -18,7 +19,8 @@ import java.util.*
  * Created by Mikael Stockman on 2019-09-07.
  */
 const val LAMP_SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-const val LAMP_COLOR_CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+const val LAMP_COLOR_CHARACTERISTIC_UUID = "beb3283e-36e1-4688-b7f5-ea07361b26a8"
+const val LAMP_EFFECT_CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 const val LAMP_NOTIFICATION_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-587ffef47e9c"
 const val LAMP_DEBUG_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-777ffef47e9c"
 
@@ -108,7 +110,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
         ) {
             characteristic?.value?.let {
                 val rgbColor = RgbColorDataObject.fromByteArray(it).color
-                Log.i(TAG, "On charac read");
+                Log.i(TAG, "On charac read")
                 callback.onColorChanged(rgbColor)
             }
         }
@@ -135,13 +137,16 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     }
 
     fun setColor(color: RgbColor) {
+        val effect = LampEffect.createStaticColorEffect(color)
+        setEffect(effect)
+    }
+
+    fun setEffect(effect: LampEffect) {
         val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+            service?.getCharacteristic(UUID.fromString(LAMP_EFFECT_CHARACTERISTIC_UUID))
 
-        val byteArray = RgbColorDataObject(color).toByteArray()
-
-        characteristic?.value = byteArray
+        characteristic?.value = effect.toByteArray()
         gatt?.writeCharacteristic(characteristic)
     }
 

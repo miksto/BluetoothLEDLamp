@@ -12,6 +12,6 @@ class StaticColor: public LampEffect {
     virtual void setup();
     virtual void next();
     virtual uint8_t* toBytes();
-    static StaticColor* fromBytes(LedStrip* strip, uint8_t effectId, uint8_t* bytes, uint8_t dataSize);
+    static StaticColor* fromBytes(LedStrip* strip, uint8_t* bytes);
 };
 #endif
