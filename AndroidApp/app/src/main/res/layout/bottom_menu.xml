@@ -14,14 +14,11 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/Title.BottomMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="@dimen/bottom_menu_icon_padding_bottom"
-            android:gravity="center_horizontal"
-            android:text="@string/menu_color_pick"
-            android:textColor="@color/text_white"
-            android:textSize="@dimen/bottom_menu_text_size" />
+            android:text="@string/menu_color_pick" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="@dimen/bottom_menu_icon_size"
@@ -40,14 +37,11 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/Title.BottomMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="@dimen/bottom_menu_icon_padding_bottom"
-            android:gravity="center_horizontal"
-            android:text="@string/menu_effects"
-            android:textColor="@color/text_white"
-            android:textSize="@dimen/bottom_menu_text_size" />
+            android:text="@string/menu_effects" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="@dimen/bottom_menu_icon_size"
@@ -65,14 +59,11 @@
         android:orientation="vertical">
 
         <TextView
+            style="@style/Title.BottomMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="@dimen/bottom_menu_icon_padding_bottom"
-            android:gravity="center_horizontal"
-            android:text="@string/menu_moods"
-            android:textColor="@color/text_white"
-            android:textSize="@dimen/bottom_menu_text_size" />
+            android:text="@string/menu_moods" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="@dimen/bottom_menu_icon_size"

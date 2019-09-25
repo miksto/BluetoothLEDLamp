@@ -26,22 +26,22 @@ class EffectAdapter : BaseAdapter() {
             EffectItem(
                 LampEffect.beacon_light,
                 R.string.beacon_light,
-                R.drawable.ic_beacon_light
+                R.drawable.ic_menu_color_blend
             ),
             EffectItem(
                 LampEffect.color_loop,
                 R.string.color_loop,
-                R.drawable.ic_color_loop
+                R.drawable.ic_menu_color_blend
             ),
             EffectItem(
                 LampEffect.rotating_lines,
                 R.string.rotating_lines,
-                R.drawable.ic_color_lines
+                R.drawable.ic_menu_color_blend
             ),
             EffectItem(
                 LampEffect.rotating_rainbow,
                 R.string.rotating_rainbow,
-                R.drawable.ic_rainbow
+                R.drawable.ic_menu_color_blend
             )
         )
     }
