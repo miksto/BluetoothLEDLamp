@@ -24,6 +24,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         const val rotating_lines = 3
         const val rotating_rainbow = 4
 
+        fun fromId(id: Int): LampEffect {
+            return LampEffect(id, null)
+        }
+
         fun createStaticColorEffect(color: RgbColor): LampEffect {
             val data = RgbColorDataObject(color)
             return LampEffect(static_color, data)

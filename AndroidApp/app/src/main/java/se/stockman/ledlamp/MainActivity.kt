@@ -5,17 +5,52 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.activity_main.*
+import se.stockman.ledlamp.data.LampEffect
+import se.stockman.ledlamp.effect.EffectFragment
 
 
-class MainActivity : ColorFragment.OnFragmentInteractionListener, AppCompatActivity() {
+class MainActivity : ColorFragment.OnFragmentInteractionListener,
+    EffectFragment.OnEffectSelectedListener, AppCompatActivity() {
+    override fun onEffectSelected(effectId: Int) {
+        val effect = LampEffect.fromId(effectId)
+        ledLamp.setEffect(effect)
+    }
 
-    val colorFragment = ColorFragment.newInstance()
+    private val colorFragment = ColorFragment.newInstance()
+    private val effectFragment = EffectFragment.newInstance()
+
+    private val onNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.color_fragment -> {
+                    setFragment(colorFragment)
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.effect_fragment -> {
+                    setFragment(effectFragment)
+                    return@OnNavigationItemSelectedListener true
+                }
+                else -> {
+                    setFragment(colorFragment)
+                    return@OnNavigationItemSelectedListener true
+                }
+            }
+        }
+
+    private fun setFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.commit()
+
+    }
 
     override fun onSetColor(color: RgbColor) {
         ledLamp.setColor(color)
@@ -29,8 +64,6 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener, AppCompatActiv
     companion object {
         val TAG: String? = MainActivity::class.simpleName
     }
-
-    val handler = Handler()
 
 
     private val lampCallback = object : LedLamp.LampCallback {
@@ -61,9 +94,8 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener, AppCompatActiv
         setContentView(R.layout.activity_main)
         startService(NotificationListener.createIntent(this))
 
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, colorFragment)
-        transaction.commit()
+        setFragment(colorFragment)
+        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
     }
 
     override fun onStart() {

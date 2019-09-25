@@ -43,6 +43,9 @@ class ColorFragment : BaseFragment() {
     }
 
     private fun updateView() {
+        if (view == null) {
+            return
+        }
         seekbar_color_red?.isEnabled = connected
         seekbar_color_green?.isEnabled = connected
         seekbar_color_blue?.isEnabled = connected

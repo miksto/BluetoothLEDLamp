@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">LEDLamp</string>
+
+    <string name="static_color">static_color</string>
+    <string name="beacon_light">Beacon light</string>
+    <string name="color_loop">Color loop</string>
+    <string name="rotating_lines">Rotating lines</string>
+    <string name="rotating_rainbow">Rotating rainbow</string>
+
 </resources>

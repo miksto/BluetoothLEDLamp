@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_recents"
+        android:id="@+id/color_fragment"
         android:enabled="true"
         android:title="Color"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_favorites"
+        android:id="@+id/effect_fragment"
         android:enabled="true"
         android:title="Effect"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_nearby"
+        android:id="@+id/mood_fragment"
         android:enabled="true"
         android:title="Mood"
         app:showAsAction="ifRoom" />
