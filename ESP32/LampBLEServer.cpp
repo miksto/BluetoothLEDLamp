@@ -37,6 +37,25 @@ class EffectCallback: public BLECharacteristicCallbacks {
     }
 };
 
+class StaticColorCallback: public BLECharacteristicCallbacks {
+  private:
+    LampBLEServerCallbacks* lampCallbacks;
+    LedStrip* strip;
+
+  public:
+    StaticColorCallback(LampBLEServerCallbacks* lampCallbacks, LedStrip* strip) {
+      this->lampCallbacks = lampCallbacks;
+      this->strip = strip;
+    }
+
+    void onWrite(BLECharacteristic *pCharacteristic) {
+        Serial.println("StaticColorCallback");
+        uint8_t* bytes = pCharacteristic->getData();
+        StaticColor* effect = (StaticColor*) LampEffect::createEffect(this->strip, bytes);
+        lampCallbacks->onSetStaticColor(effect);
+    }
+};
+
 class NotificationAlertCallback: public BLECharacteristicCallbacks {
   private:
     LampBLEServerCallbacks* lampCallbacks;
@@ -85,7 +104,8 @@ void LampBLEServer::setup() {
 
   this->staticColorCharacteristic = this->service->createCharacteristic(
                                          LampBLEUUID::characteristic_static_color,
-                                         BLECharacteristic::PROPERTY_READ
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE
                                        );
 
    this->debugButtonCharacteristic = this->service->createCharacteristic(
@@ -107,6 +127,7 @@ void LampBLEServer::setColorCharacteristicValue(RgbColor color) {
 
 void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks, LedStrip* strip) {
   this->effectCharacteristic->setCallbacks(new EffectCallback(callbacks, strip));
+  this->staticColorCharacteristic->setCallbacks(new StaticColorCallback(callbacks, strip));
   this->notificationCharacteristic->setCallbacks(new NotificationAlertCallback(callbacks));
   this->debugButtonCharacteristic->setCallbacks(new DebugButtonCallback(callbacks));
 }

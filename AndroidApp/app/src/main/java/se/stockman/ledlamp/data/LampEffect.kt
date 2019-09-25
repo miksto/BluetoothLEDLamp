@@ -44,6 +44,12 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
             return LampEffect(static_color, data)
         }
 
+        fun getColorForStaticColorEffect(bytes: ByteArray): RgbColor {
+            val data =
+                RgbColorDataObject.fromByteArray(bytes.slice(1 until bytes.size).toByteArray())
+            return data.color
+        }
+
         fun createColorLoopEffect(): LampEffect {
             return LampEffect(color_loop, null)
         }

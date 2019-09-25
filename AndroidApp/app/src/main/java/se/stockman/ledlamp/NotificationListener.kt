@@ -56,7 +56,7 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
-        handleNotificationChange(sbn)
+//        handleNotificationChange(sbn)
     }
 
     private fun handleNotificationChange(sbn: StatusBarNotification?) {

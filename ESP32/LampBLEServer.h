@@ -7,6 +7,7 @@
 #include <BLEServer.h>
 #include <BLEUUID.h>
 #include "LampEffect.h"
+#include "StaticColor.h"
 
 namespace LampBLEUUID
 {
@@ -21,6 +22,7 @@ class LampBLEServerCallbacks {
   public:
     virtual void onSetHslColor(HslColor color);
     virtual void onSetEffect(LampEffect* effect);
+    virtual void onSetStaticColor(StaticColor* effect);
     virtual void onNotificationAlert();
     virtual void debugButtonPress();
 };

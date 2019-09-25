@@ -10,11 +10,7 @@ import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.palette.graphics.Palette
-import se.stockman.ledlamp.data.HlsColor
-import se.stockman.ledlamp.data.RgbColor
-import se.stockman.ledlamp.data.HlsColorDataObject
-import se.stockman.ledlamp.data.LampEffect
-import se.stockman.ledlamp.data.RgbColorDataObject
+import se.stockman.ledlamp.data.*
 import java.util.*
 
 /**
@@ -111,7 +107,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             status: Int
         ) {
             characteristic?.value?.let {
-                val rgbColor = RgbColorDataObject.fromByteArray(it).color
+                val rgbColor = LampEffect.getColorForStaticColorEffect(it)
                 Log.i(TAG, "On charac read")
                 callback.onColorChanged(rgbColor)
             }
@@ -139,8 +135,13 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     }
 
     fun setColor(color: RgbColor) {
+        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+        val characteristic =
+            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+
         val effect = LampEffect.createStaticColorEffect(color)
-        setEffect(effect)
+        characteristic?.value = effect.toByteArray()
+        gatt?.writeCharacteristic(characteristic)
     }
 
     fun setEffect(effect: LampEffect) {
