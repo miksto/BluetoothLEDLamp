@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bottom_menu_background"
+    android:orientation="horizontal"
+    android:paddingTop="8dp">
+
+    <LinearLayout
+        android:id="@+id/menu_color_picker"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="@dimen/bottom_menu_icon_padding_bottom"
+            android:gravity="center_horizontal"
+            android:text="@string/menu_color_pick"
+            android:textColor="@color/text_white"
+            android:textSize="@dimen/bottom_menu_text_size" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/bottom_menu_icon_size"
+            android:layout_height="@dimen/bottom_menu_icon_size"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_menu_color_blend" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_effect_picker"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="@dimen/bottom_menu_icon_padding_bottom"
+            android:gravity="center_horizontal"
+            android:text="@string/menu_effects"
+            android:textColor="@color/text_white"
+            android:textSize="@dimen/bottom_menu_text_size" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/bottom_menu_icon_size"
+            android:layout_height="@dimen/bottom_menu_icon_size"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_menu_effects" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_mood_picker"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="@dimen/bottom_menu_icon_padding_bottom"
+            android:gravity="center_horizontal"
+            android:text="@string/menu_moods"
+            android:textColor="@color/text_white"
+            android:textSize="@dimen/bottom_menu_text_size" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="@dimen/bottom_menu_icon_size"
+            android:layout_height="@dimen/bottom_menu_icon_size"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_menu_moods" />
+
+    </LinearLayout>
+
+</LinearLayout>

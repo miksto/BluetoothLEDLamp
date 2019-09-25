@@ -31,12 +31,12 @@ class ColorFragment : BaseFragment() {
 
         override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
             // Display the current progress of SeekBar
-            val brightnessFactor = seekbar_brighness.progress / 100f
+            val brightnessFactor = seek_bar_brightness.progress / 100f
 
             val color = RgbColor(
-                (seekbar_color_red.progress * brightnessFactor).toInt(),
-                (seekbar_color_green.progress * brightnessFactor).toInt(),
-                (seekbar_color_blue.progress * brightnessFactor).toInt()
+                (seek_bar_color_red.progress * brightnessFactor).toInt(),
+                (seek_bar_color_green.progress * brightnessFactor).toInt(),
+                (seek_bar_color_blue.progress * brightnessFactor).toInt()
             )
             listener?.onSetColor(color)
         }
@@ -46,28 +46,28 @@ class ColorFragment : BaseFragment() {
         if (view == null) {
             return
         }
-        seekbar_color_red?.isEnabled = connected
-        seekbar_color_green?.isEnabled = connected
-        seekbar_color_blue?.isEnabled = connected
-        seekbar_brighness?.isEnabled = connected
+        seek_bar_color_red?.isEnabled = connected
+        seek_bar_color_green?.isEnabled = connected
+        seek_bar_color_blue?.isEnabled = connected
+        seek_bar_brightness?.isEnabled = connected
 
         currentColor?.let {
-            seekbar_color_red.setOnSeekBarChangeListener(null)
-            seekbar_color_green.setOnSeekBarChangeListener(null)
-            seekbar_color_blue.setOnSeekBarChangeListener(null)
-            seekbar_brighness.setOnSeekBarChangeListener(null)
+            seek_bar_color_red.setOnSeekBarChangeListener(null)
+            seek_bar_color_green.setOnSeekBarChangeListener(null)
+            seek_bar_color_blue.setOnSeekBarChangeListener(null)
+            seek_bar_brightness.setOnSeekBarChangeListener(null)
 
 
-            seekbar_color_red?.progress = it.red
-            seekbar_color_green?.progress = it.green
-            seekbar_color_blue?.progress = it.blue
-            seekbar_brighness?.progress = seekbar_brighness.max
+            seek_bar_color_red?.progress = it.red
+            seek_bar_color_green?.progress = it.green
+            seek_bar_color_blue?.progress = it.blue
+            seek_bar_brightness?.progress = seek_bar_brightness.max
 
 
-            seekbar_color_red.setOnSeekBarChangeListener(seekbarListener)
-            seekbar_color_green.setOnSeekBarChangeListener(seekbarListener)
-            seekbar_color_blue.setOnSeekBarChangeListener(seekbarListener)
-            seekbar_brighness.setOnSeekBarChangeListener(seekbarListener)
+            seek_bar_color_red.setOnSeekBarChangeListener(seekbarListener)
+            seek_bar_color_green.setOnSeekBarChangeListener(seekbarListener)
+            seek_bar_color_blue.setOnSeekBarChangeListener(seekbarListener)
+            seek_bar_brightness.setOnSeekBarChangeListener(seekbarListener)
         }
     }
 
@@ -83,14 +83,10 @@ class ColorFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        seekbar_color_red.setOnSeekBarChangeListener(seekbarListener)
-        seekbar_color_green.setOnSeekBarChangeListener(seekbarListener)
-        seekbar_color_blue.setOnSeekBarChangeListener(seekbarListener)
-        seekbar_brighness.setOnSeekBarChangeListener(seekbarListener)
-
-        debug_button.setOnClickListener {
-            listener?.onDebugButtonPressed()
-        }
+        seek_bar_color_red.setOnSeekBarChangeListener(seekbarListener)
+        seek_bar_color_green.setOnSeekBarChangeListener(seekbarListener)
+        seek_bar_color_blue.setOnSeekBarChangeListener(seekbarListener)
+        seek_bar_brightness.setOnSeekBarChangeListener(seekbarListener)
         updateView()
     }
 

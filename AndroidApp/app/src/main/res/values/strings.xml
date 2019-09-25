@@ -6,5 +6,12 @@
     <string name="color_loop">Color loop</string>
     <string name="rotating_lines">Rotating lines</string>
     <string name="rotating_rainbow">Rotating rainbow</string>
+    <string name="menu_color_pick">Color pick</string>
+    <string name="menu_effects">Effects</string>
+    <string name="menu_moods">Moods</string>
+    <string name="title_red">Red</string>
+    <string name="title_green">Green</string>
+    <string name="title_blue">Blue</string>
+    <string name="title_brightness">Brightness</string>
 
 </resources>

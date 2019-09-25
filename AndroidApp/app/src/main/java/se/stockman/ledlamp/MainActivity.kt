@@ -11,8 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.bottom_menu.*
 import se.stockman.ledlamp.data.LampEffect
 import se.stockman.ledlamp.effect.EffectFragment
 
@@ -26,24 +25,6 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     private val colorFragment = ColorFragment.newInstance()
     private val effectFragment = EffectFragment.newInstance()
-
-    private val onNavigationItemSelectedListener =
-        BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.color_fragment -> {
-                    setFragment(colorFragment)
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.effect_fragment -> {
-                    setFragment(effectFragment)
-                    return@OnNavigationItemSelectedListener true
-                }
-                else -> {
-                    setFragment(colorFragment)
-                    return@OnNavigationItemSelectedListener true
-                }
-            }
-        }
 
     private fun setFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
@@ -95,7 +76,9 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         startService(NotificationListener.createIntent(this))
 
         setFragment(colorFragment)
-        navigation.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        menu_color_picker.setOnClickListener { setFragment(colorFragment) }
+        menu_effect_picker.setOnClickListener { setFragment(effectFragment) }
+        menu_mood_picker.setOnClickListener { setFragment(colorFragment) }
     }
 
     override fun onStart() {
