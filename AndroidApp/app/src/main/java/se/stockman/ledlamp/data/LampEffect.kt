@@ -25,6 +25,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         const val woods = 6
         const val sakura = 7
         const val ruby_room = 8
+        const val glimmer_effect = 10
 
 
         fun fromId(id: Int): LampEffect {
@@ -33,13 +34,20 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
             }
 
             return when (id) {
-                sunset -> createStaticColorEffect(RgbColor(200, 14, 0))
+                sunset -> createGlimmerEffect(RgbColor(200, 14, 0), RgbColor(33, 0, 1))
                 woods -> createStaticColorEffect(RgbColor(0, 25, 1))
                 sakura -> createStaticColorEffect(RgbColor(174, 21, 31))
                 ruby_room -> createStaticColorEffect(RgbColor(33, 0, 1))
                 else -> createStaticColorEffect(RgbColor(174, 21, 31))
             }
         }
+
+
+        fun createGlimmerEffect(primaryColor: RgbColor, secondary: RgbColor): LampEffect {
+            val data = DualRgbColorDataObject(primaryColor, secondary)
+            return LampEffect(glimmer_effect, data)
+        }
+
 
         fun createStaticColorEffect(color: RgbColor): LampEffect {
             val data = RgbColorDataObject(color)

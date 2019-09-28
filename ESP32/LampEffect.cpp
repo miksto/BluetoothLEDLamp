@@ -4,6 +4,7 @@
 #include "ColorLoop.h"
 #include "RotatingLines.h"
 #include "RotatingRainbow.h"
+#include "GlimmeringEffect.h"
 
 LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
   uint8_t effectId = bytes[0];
@@ -29,6 +30,8 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
     case LampEffectId::rotating_lines: return new RotatingLines(strip);
 
     case LampEffectId::rotating_rainbow: return new RotatingRainbow(strip);
+
+    case LampEffectId::glimmering_effect: return GlimmeringEffect::fromBytes(strip, effectData);
   }
   Serial.print("Invalid effectId: ");
   Serial.println(effectId);
@@ -45,5 +48,7 @@ uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
     case LampEffectId::rotating_lines: return LampEffectEepromDataSize::rotating_lines;
 
     case LampEffectId::rotating_rainbow: return LampEffectEepromDataSize::rotating_rainbow;
+
+    case LampEffectId::glimmering_effect: return LampEffectEepromDataSize::glimmering_effect;
   }
 }

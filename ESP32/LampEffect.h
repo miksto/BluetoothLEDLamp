@@ -10,6 +10,7 @@ namespace LampEffectId {
   const uint8_t color_loop = 2;
   const uint8_t rotating_lines = 3;
   const uint8_t rotating_rainbow = 4;
+  const uint8_t glimmering_effect = 10;
 };
 
 namespace LampEffectEepromDataSize {
@@ -18,6 +19,7 @@ namespace LampEffectEepromDataSize {
   const uint8_t color_loop = 0;
   const uint8_t rotating_lines = 0;
   const uint8_t rotating_rainbow = 0;
+  const uint8_t glimmering_effect = (RGB_COLOR_BYTES_LENGTH * 2);
 };
 
 class LampEffect {
