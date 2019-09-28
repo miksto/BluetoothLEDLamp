@@ -37,6 +37,11 @@ class MoodAdapter : BaseAdapter() {
                 LampEffect.sakura,
                 R.string.mood_sakura,
                 R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                LampEffect.ruby_room,
+                R.string.mood_ruby,
+                R.drawable.ic_menu_color_blend
             )
         )
     }

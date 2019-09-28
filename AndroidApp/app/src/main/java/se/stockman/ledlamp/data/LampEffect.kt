@@ -24,6 +24,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         const val sunset = 5
         const val woods = 6
         const val sakura = 7
+        const val ruby_room = 8
 
 
         fun fromId(id: Int): LampEffect {
@@ -35,6 +36,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 sunset -> createStaticColorEffect(RgbColor(200, 14, 0))
                 woods -> createStaticColorEffect(RgbColor(0, 25, 1))
                 sakura -> createStaticColorEffect(RgbColor(174, 21, 31))
+                ruby_room -> createStaticColorEffect(RgbColor(33, 0, 1))
                 else -> createStaticColorEffect(RgbColor(174, 21, 31))
             }
         }
