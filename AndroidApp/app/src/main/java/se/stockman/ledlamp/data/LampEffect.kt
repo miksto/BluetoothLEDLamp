@@ -29,7 +29,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
 
 
         fun fromId(id: Int): LampEffect {
-            if (id < rotating_rainbow) {
+            if (id <= rotating_rainbow) {
                 return LampEffect(id, null)
             }
 
