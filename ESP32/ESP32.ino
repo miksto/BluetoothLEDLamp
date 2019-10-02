@@ -71,12 +71,17 @@ class LampCallbacks: public LampBLEServerCallbacks {
     }
 
     void onSetEffect(LampEffect* newEffect) {
+      if (effect->id != LampEffectId::static_color) {
+        delete effect;
+      }
+
       effect = newEffect;
       effect->setup();
       setDirty();
     }
 
     void onSetStaticColor(StaticColor* newEffect) {
+      delete staticColorEffect;
       staticColorEffect = newEffect;
       effect = staticColorEffect;
       effect->setup();
