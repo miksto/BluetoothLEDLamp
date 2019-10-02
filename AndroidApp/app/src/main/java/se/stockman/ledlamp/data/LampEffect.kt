@@ -1,5 +1,7 @@
 package se.stockman.ledlamp.data
 
+import se.stockman.ledlamp.mood.MoodAdapter
+
 /**
  * Created by Mikael Stockman on 2019-09-25.
  */
@@ -21,25 +23,32 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         const val color_loop = 2
         const val rotating_lines = 3
         const val rotating_rainbow = 4
-        const val sunset = 5
-        const val woods = 6
-        const val sakura = 7
-        const val ruby_room = 8
-        const val glimmer_effect = 10
+        const val glimmer_effect = 5
 
 
-        fun fromId(id: Int): LampEffect {
-            if (id <= rotating_rainbow) {
-                return LampEffect(id, null)
-            }
-
+        fun moodFromId(id: Int): LampEffect {
             return when (id) {
-                sunset -> createGlimmerEffect(RgbColor(200, 14, 0), RgbColor(33, 0, 1))
-                woods -> createStaticColorEffect(RgbColor(0, 25, 1))
-                sakura -> createStaticColorEffect(RgbColor(174, 21, 31))
-                ruby_room -> createStaticColorEffect(RgbColor(33, 0, 1))
+                MoodAdapter.sunset -> createGlimmerEffect(RgbColor(200, 14, 0), RgbColor(33, 0, 1))
+                MoodAdapter.sunset2 -> createGlimmerEffect(RgbColor(200, 14, 0), RgbColor(200, 28, 0))
+                MoodAdapter.woods -> createGlimmerEffect(RgbColor(0, 25, 1), RgbColor(0, 0, 0))
+                MoodAdapter.sakura -> createGlimmerEffect(
+                    RgbColor(174, 21, 31),
+                    RgbColor(60, 60, 120)
+                )
+                MoodAdapter.ruby_room -> createGlimmerEffect(
+                    RgbColor(33, 0, 1),
+                    RgbColor(100, 100, 100)
+                )
+                MoodAdapter.star_night -> createGlimmerEffect(
+                    RgbColor(0, 0, 15),
+                    RgbColor(0, 0, 80)
+                )
                 else -> createStaticColorEffect(RgbColor(174, 21, 31))
             }
+        }
+
+        fun effectFromId(id: Int): LampEffect {
+            return LampEffect(id, null)
         }
 
 

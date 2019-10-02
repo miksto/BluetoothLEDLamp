@@ -16,6 +16,15 @@ import se.stockman.ledlamp.data.LampEffect
 
 class MoodAdapter : BaseAdapter() {
 
+    companion object {
+        const val sunset = 100
+        const val woods = 101
+        const val sakura = 102
+        const val ruby_room = 103
+        const val star_night = 104
+        const val sunset2 = 105
+    }
+
     private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
 
     private var items: List<EffectItem>
@@ -24,23 +33,33 @@ class MoodAdapter : BaseAdapter() {
     init {
         items = listOf(
             EffectItem(
-                LampEffect.sunset,
+                sunset,
                 R.string.mood_sunset,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
-                LampEffect.woods,
+                sunset2,
+                R.string.mood_sunset,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                woods,
                 R.string.mood_woods,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
-                LampEffect.sakura,
+                sakura,
                 R.string.mood_sakura,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
-                LampEffect.ruby_room,
+                ruby_room,
                 R.string.mood_ruby,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                star_night,
+                R.string.star_night,
                 R.drawable.ic_menu_color_blend
             )
         )

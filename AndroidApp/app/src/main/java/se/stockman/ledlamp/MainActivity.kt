@@ -26,12 +26,12 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
     EffectFragment.OnEffectSelectedListener, MoodFragment.OnMoodSelectedListener,
     AppCompatActivity() {
     override fun onMoodSelected(effectId: Int) {
-        val effect = LampEffect.fromId(effectId)
+        val effect = LampEffect.moodFromId(effectId)
         ledLamp.setEffect(effect)
     }
 
     override fun onEffectSelected(effectId: Int) {
-        val effect = LampEffect.fromId(effectId)
+        val effect = LampEffect.effectFromId(effectId)
         ledLamp.setEffect(effect)
     }
 
