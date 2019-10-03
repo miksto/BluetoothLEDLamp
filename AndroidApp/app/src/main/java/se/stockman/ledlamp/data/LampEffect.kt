@@ -27,7 +27,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
-                MoodAdapter.sunset -> createGlimmerEffect(RgbColor(200, 14, 0), RgbColor(33, 0, 1))
+                MoodAdapter.sunset -> createGlimmerEffect(
+                    RgbColor(200, 14, 0),
+                    RgbColor(33, 0, 1)
+                )
                 MoodAdapter.sunset2 -> createGlimmerEffect(
                     RgbColor(200, 14, 0),
                     RgbColor(200, 28, 0)

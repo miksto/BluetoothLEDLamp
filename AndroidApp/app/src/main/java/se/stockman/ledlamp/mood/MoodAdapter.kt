@@ -39,7 +39,12 @@ class MoodAdapter : BaseAdapter() {
             ),
             EffectItem(
                 sunset2,
-                R.string.mood_sunset,
+                R.string.mood_sunset2,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                timed_sunset,
+                R.string.mood_timed_sunset,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
@@ -60,11 +65,6 @@ class MoodAdapter : BaseAdapter() {
             EffectItem(
                 star_night,
                 R.string.star_night,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                timed_sunset,
-                R.string.mood_timed_sunset,
                 R.drawable.ic_menu_color_blend
             )
         )
