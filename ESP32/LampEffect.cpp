@@ -29,13 +29,17 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
 
     case LampEffectId::rotating_lines: return new RotatingLines(strip);
 
-    case LampEffectId::rotating_rainbow: return new RotatingRainbow(strip);
+    case LampEffectId::rotating_rainbow: return RotatingRainbow::fromBytes(strip, effectData);
 
     case LampEffectId::glimmering_effect: return GlimmeringEffect::fromBytes(strip, effectData);
   }
   Serial.print("Invalid effectId: ");
   Serial.println(effectId);
 }
+
+//StaticColor* LampEffect::createStaticColorEffect(LedStrip* strip, uint8_t* bytes) {
+//  return StaticColor::fromBytes(strip, bytes[1]);
+//}
 
 uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
   switch (effectId) {

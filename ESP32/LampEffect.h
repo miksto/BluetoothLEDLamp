@@ -18,8 +18,9 @@ namespace LampEffectEepromDataSize {
   const uint8_t beacon_light = 0;
   const uint8_t color_loop = 0;
   const uint8_t rotating_lines = 0;
-  const uint8_t rotating_rainbow = 0;
+  const uint8_t rotating_rainbow = 1;
   const uint8_t glimmering_effect = (RGB_COLOR_BYTES_LENGTH * 2);
+  
 };
 
 class LampEffect {
@@ -32,6 +33,7 @@ class LampEffect {
       : strip(the_strip), id(id), eepromDataSize(eepromDataSize) {
     }
     static LampEffect* createEffect(LedStrip* strip, uint8_t* bytes);
+    
     static uint8_t dataSizeForEffectId(uint8_t effectId);
 
     virtual void setup() = 0;

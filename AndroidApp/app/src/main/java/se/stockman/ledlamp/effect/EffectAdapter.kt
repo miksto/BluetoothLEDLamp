@@ -8,13 +8,20 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.effect_grid_item.view.*
 import se.stockman.ledlamp.R
-import se.stockman.ledlamp.data.LampEffect
 
 /**
  * Created by Mikael Stockman on 2019-09-25.
  */
 
 class EffectAdapter : BaseAdapter() {
+
+    companion object {
+        const val beacon_light = 1
+        const val color_loop = 2
+        const val rotating_lines = 3
+        const val rotating_rainbow = 4
+        const val rotating_rainbow2 = 5
+    }
 
     private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
 
@@ -24,23 +31,28 @@ class EffectAdapter : BaseAdapter() {
     init {
         items = listOf(
             EffectItem(
-                LampEffect.beacon_light,
+                beacon_light,
                 R.string.beacon_light,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
-                LampEffect.color_loop,
+                color_loop,
                 R.string.color_loop,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
-                LampEffect.rotating_lines,
+                rotating_lines,
                 R.string.rotating_lines,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
-                LampEffect.rotating_rainbow,
+                rotating_rainbow,
                 R.string.rotating_rainbow,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                rotating_rainbow2,
+                R.string.rotating_rainbow2,
                 R.drawable.ic_menu_color_blend
             )
         )

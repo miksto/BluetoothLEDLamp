@@ -2,22 +2,51 @@
 #include "LedStrip.h"
 #include <NeoPixelBus.h>
 
-RotatingRainbow::RotatingRainbow(LedStrip* strip) : LampEffect(strip, LampEffectId::rotating_rainbow, LampEffectEepromDataSize::rotating_rainbow) {
+RotatingRainbow::RotatingRainbow(LedStrip* strip, float colorInterval)
+  : LampEffect(strip, LampEffectId::rotating_rainbow, LampEffectEepromDataSize::rotating_rainbow) {
+  this->colorInterval = colorInterval;
+  this->hueValue = 0;
+}
 
+void RotatingRainbow::applyGradient() {
+  float startValue = this->hueValue;
+  float endValue = (this->hueValue + this->colorInterval);
+  
+  for (int i = 0; i < LedStripConstants::led_count; i++) {
+    float progress = 1 - (i / (float) LedStripConstants::led_count);
+    float currentHueValue = this->hueValue + progress * this->colorInterval;
+    if (currentHueValue > 1) {
+      currentHueValue -=1;
+    }
+    if (currentHueValue < 0) {
+      currentHueValue +=1;
+    }
+    HslColor color = HslColor(currentHueValue, 1, 0.4);
+    this->strip->SetPixelColor(i, color);
+  }
+  this->strip->Show();
 }
 
 void RotatingRainbow::setup() {
-  for (int i = 0; i< LedStripConstants::led_count; i++) {
-      HslColor color = HslColor(i*(1.0/LedStripConstants::led_count), 1, 0.5);
-      strip->SetPixelColor(i, color);
-  }
-  strip->Show();
+  applyGradient();
 }
 
 void RotatingRainbow::next() {
-  strip->RotateLeft(1);
-  strip->Show();
+  this->hueValue -= 0.0025;
+  if (this->hueValue < 0) {
+    this->hueValue += 1;
+  }
+  applyGradient();
   delay(40);
 }
 
-uint8_t* RotatingRainbow::toBytes() { return nullptr; }
+uint8_t* RotatingRainbow::toBytes() {
+  uint8_t *bytes = new uint8_t[this->eepromDataSize];
+  bytes[0] = (int) (this->colorInterval * 255);
+  return bytes;
+}
+
+RotatingRainbow* RotatingRainbow::fromBytes(LedStrip* strip, uint8_t* bytes) {
+  float colorInterval = bytes[0] / 255.0f;
+  return new RotatingRainbow(strip, colorInterval);
+}
