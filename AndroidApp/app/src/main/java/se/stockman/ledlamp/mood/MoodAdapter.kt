@@ -8,7 +8,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import kotlinx.android.synthetic.main.effect_grid_item.view.*
 import se.stockman.ledlamp.R
-import se.stockman.ledlamp.data.LampEffect
 
 /**
  * Created by Mikael Stockman on 2019-09-25.
@@ -23,6 +22,7 @@ class MoodAdapter : BaseAdapter() {
         const val ruby_room = 103
         const val star_night = 104
         const val sunset2 = 105
+        const val timed_sunset = 106
     }
 
     private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
@@ -60,6 +60,11 @@ class MoodAdapter : BaseAdapter() {
             EffectItem(
                 star_night,
                 R.string.star_night,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                timed_sunset,
+                R.string.mood_timed_sunset,
                 R.drawable.ic_menu_color_blend
             )
         )

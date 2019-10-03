@@ -23,6 +23,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         const val esp_32_rotating_lines = 3
         const val esp_32_rotating_rainbow = 4
         const val esp_32_glimmer_effect = 5
+        const val esp_32_timed_sunset = 6
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
@@ -30,6 +31,15 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 MoodAdapter.sunset2 -> createGlimmerEffect(
                     RgbColor(200, 14, 0),
                     RgbColor(200, 28, 0)
+                )
+                MoodAdapter.timed_sunset -> LampEffect(
+                    esp_32_timed_sunset,
+                    SunsetDataObject(
+                        timeDuration = 30,
+                        colorInterval = 0.025f,
+                        startHue = 0.1f,
+                        endHue = 0.66f
+                    )
                 )
                 MoodAdapter.woods -> createGlimmerEffect(RgbColor(0, 25, 1), RgbColor(0, 0, 0))
                 MoodAdapter.sakura -> createGlimmerEffect(
