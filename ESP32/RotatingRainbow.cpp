@@ -9,9 +9,6 @@ RotatingRainbow::RotatingRainbow(LedStrip* strip, float colorInterval)
 }
 
 void RotatingRainbow::applyGradient() {
-  float startValue = this->hueValue;
-  float endValue = (this->hueValue + this->colorInterval);
-  
   for (int i = 0; i < LedStripConstants::led_count; i++) {
     float progress = 1 - (i / (float) LedStripConstants::led_count);
     float currentHueValue = this->hueValue + progress * this->colorInterval;

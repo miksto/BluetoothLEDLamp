@@ -40,10 +40,6 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
   Serial.println(effectId);
 }
 
-//StaticColor* LampEffect::createStaticColorEffect(LedStrip* strip, uint8_t* bytes) {
-//  return StaticColor::fromBytes(strip, bytes[1]);
-//}
-
 uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
   switch (effectId) {
     case LampEffectId::static_color: return LampEffectEepromDataSize::static_color;
