@@ -40,8 +40,8 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     SunsetDataObject(
                         timeDuration = 30,
                         colorInterval = 0.025f,
-                        startHue = 0.1f,
-                        endHue = 0.66f
+                        startHue = 0.05f,
+                        endHue = 0.95f
                     )
                 )
                 MoodAdapter.woods -> createGlimmerEffect(RgbColor(0, 25, 1), RgbColor(0, 0, 0))
