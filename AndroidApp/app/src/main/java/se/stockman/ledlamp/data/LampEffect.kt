@@ -65,11 +65,15 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
             return when (id) {
                 EffectAdapter.rotating_rainbow -> LampEffect(
                     esp_32_rotating_rainbow,
-                    SimpleValueDataObject.fromFraction(1.0f)
+                    RotatingRainbbowDataObject(colorInterval = 0.8f, speed = 0.5f)
                 )
-                EffectAdapter.rotating_rainbow2 -> LampEffect(
+                EffectAdapter.flowy_colors -> LampEffect(
                     esp_32_rotating_rainbow,
-                    SimpleValueDataObject.fromFraction(0.25f)
+                    RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 0.03f)
+                )
+                EffectAdapter.fekke -> LampEffect(
+                        esp_32_rotating_rainbow,
+                        RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 1f)
                 )
                 EffectAdapter.beacon_light -> LampEffect(esp_32_beacon_light, null)
                 EffectAdapter.color_loop -> LampEffect(esp_32_color_loop, null)
