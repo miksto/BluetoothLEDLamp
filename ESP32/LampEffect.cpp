@@ -38,6 +38,7 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
   }
   Serial.print("Invalid effectId: ");
   Serial.println(effectId);
+  return new BeaconLight(strip);
 }
 
 uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
@@ -56,4 +57,5 @@ uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
 
     case LampEffectId::sunset_effect: return LampEffectEepromDataSize::sunset_effect;
   }
+  return LampEffectEepromDataSize::beacon_light;
 }
