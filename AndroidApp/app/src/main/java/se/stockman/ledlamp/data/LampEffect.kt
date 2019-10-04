@@ -17,13 +17,14 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
     }
 
     companion object {
-        const val esp_32_static_color = 0
-        const val esp_32_beacon_light = 1
-        const val esp_32_color_loop = 2
-        const val esp_32_rotating_lines = 3
-        const val esp_32_rotating_rainbow = 4
-        const val esp_32_glimmer_effect = 5
-        const val esp_32_timed_sunset = 6
+        private const val esp_32_static_color = 0
+        private const val esp_32_beacon_light = 1
+        private const val esp_32_color_loop = 2
+        private const val esp_32_rotating_lines = 3
+        private const val esp_32_rotating_rainbow = 4
+        private const val esp_32_glimmer_effect = 5
+        private const val esp_32_timed_sunset = 6
+        private const val esp_32_fakka_ur = 7
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
@@ -72,9 +73,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 0.03f)
                 )
                 EffectAdapter.fekke -> LampEffect(
-                        esp_32_rotating_rainbow,
-                        RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 1f)
+                    esp_32_rotating_rainbow,
+                    RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 1f)
                 )
+                EffectAdapter.fakka_ur -> LampEffect(esp_32_fakka_ur, null)
                 EffectAdapter.beacon_light -> LampEffect(esp_32_beacon_light, null)
                 EffectAdapter.color_loop -> LampEffect(esp_32_color_loop, null)
                 EffectAdapter.rotating_lines -> LampEffect(esp_32_rotating_lines, null)
