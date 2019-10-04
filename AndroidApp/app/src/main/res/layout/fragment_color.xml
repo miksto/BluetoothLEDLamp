@@ -57,19 +57,4 @@
         android:min="0"
         android:progressDrawable="@drawable/seek_bar_progress"
         android:thumb="@drawable/seek_bar_thumb" />
-
-    <TextView
-        style="@style/Title.SeekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/title_brightness" />
-
-    <SeekBar
-        android:id="@+id/seek_bar_brightness"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="100"
-        android:min="0"
-        android:progressDrawable="@drawable/seek_bar_progress"
-        android:thumb="@drawable/seek_bar_thumb" />
 </LinearLayout>

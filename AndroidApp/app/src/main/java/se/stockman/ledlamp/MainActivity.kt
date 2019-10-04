@@ -9,6 +9,7 @@ import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
@@ -62,6 +63,10 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
 
     private val lampCallback = object : LedLamp.LampCallback {
+        override fun onDimFactorReceived(dimFactor: Int) {
+            seek_bar_brightness.progress = dimFactor
+        }
+
         override fun onConnectionStateChange(connected: Boolean) {
             handler.post {
                 if (connected) {
@@ -75,7 +80,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
             moodFragment.onConnectionStateChange(connected)
         }
 
-        override fun onColorChanged(color: RgbColor) {
+        override fun onColorReceived(color: RgbColor) {
             colorFragment.setColor(color)
         }
     }
@@ -85,6 +90,16 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
             lampFinder.stop()
             if (ledLamp.hasNoDevice()) {
                 ledLamp.connectToDevice(device, this@MainActivity)
+            }
+        }
+    }
+
+    private val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
+        override fun onStartTrackingTouch(p0: SeekBar?) {}
+        override fun onStopTrackingTouch(p0: SeekBar?) {}
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, userInitiated: Boolean) {
+            if (userInitiated) {
+                ledLamp.setDimFactor(progress)
             }
         }
     }
@@ -102,6 +117,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         menu_color_picker.setOnClickListener { setFragment(colorFragment) }
         menu_effect_picker.setOnClickListener { setFragment(effectFragment) }
         menu_mood_picker.setOnClickListener { setFragment(moodFragment) }
+        seek_bar_brightness.setOnSeekBarChangeListener(seekbarListener)
     }
 
     override fun onStart() {

@@ -32,16 +32,16 @@ class ColorFragment : BaseFragment() {
 
         }
 
-        override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, userInitiated: Boolean) {
             // Display the current progress of SeekBar
-            val brightnessFactor = seek_bar_brightness.progress / 100f
-
-            val color = RgbColor(
-                (seek_bar_color_red.progress * brightnessFactor).toInt(),
-                (seek_bar_color_green.progress * brightnessFactor).toInt(),
-                (seek_bar_color_blue.progress * brightnessFactor).toInt()
-            )
-            listener?.onSetColor(color)
+            if (userInitiated) {
+                val color = RgbColor(
+                    seek_bar_color_red.progress,
+                    seek_bar_color_green.progress,
+                    seek_bar_color_blue.progress
+                )
+                listener?.onSetColor(color)
+            }
         }
     }
 
@@ -52,25 +52,11 @@ class ColorFragment : BaseFragment() {
         seek_bar_color_red?.isEnabled = connected
         seek_bar_color_green?.isEnabled = connected
         seek_bar_color_blue?.isEnabled = connected
-        seek_bar_brightness?.isEnabled = connected
 
         currentColor?.let {
-            seek_bar_color_red.setOnSeekBarChangeListener(null)
-            seek_bar_color_green.setOnSeekBarChangeListener(null)
-            seek_bar_color_blue.setOnSeekBarChangeListener(null)
-            seek_bar_brightness.setOnSeekBarChangeListener(null)
-
-
             seek_bar_color_red?.progress = it.red
             seek_bar_color_green?.progress = it.green
             seek_bar_color_blue?.progress = it.blue
-            seek_bar_brightness?.progress = seek_bar_brightness.max
-
-
-            seek_bar_color_red.setOnSeekBarChangeListener(seekbarListener)
-            seek_bar_color_green.setOnSeekBarChangeListener(seekbarListener)
-            seek_bar_color_blue.setOnSeekBarChangeListener(seekbarListener)
-            seek_bar_brightness.setOnSeekBarChangeListener(seekbarListener)
         }
     }
 
@@ -89,7 +75,6 @@ class ColorFragment : BaseFragment() {
         seek_bar_color_red.setOnSeekBarChangeListener(seekbarListener)
         seek_bar_color_green.setOnSeekBarChangeListener(seekbarListener)
         seek_bar_color_blue.setOnSeekBarChangeListener(seekbarListener)
-        seek_bar_brightness.setOnSeekBarChangeListener(seekbarListener)
         updateView()
     }
 

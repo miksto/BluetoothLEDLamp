@@ -10,7 +10,10 @@ import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.palette.graphics.Palette
-import se.stockman.ledlamp.data.*
+import se.stockman.ledlamp.data.HlsColor
+import se.stockman.ledlamp.data.HlsColorDataObject
+import se.stockman.ledlamp.data.LampEffect
+import se.stockman.ledlamp.data.RgbColor
 import java.util.*
 
 /**
@@ -21,6 +24,7 @@ const val LAMP_COLOR_CHARACTERISTIC_UUID = "beb3283e-36e1-4688-b7f5-ea07361b26a8
 const val LAMP_EFFECT_CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 const val LAMP_NOTIFICATION_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-587ffef47e9c"
 const val LAMP_DEBUG_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-777ffef47e9c"
+const val LAMP_DIM_FACTOR_CHARACTERISTIC_UUID = "836457c0-1c54-419f-945b-587ffef47e9c"
 
 class LedLamp(private val context: Context, private val callback: LampCallback) {
     companion object {
@@ -30,7 +34,8 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     }
 
     interface LampCallback {
-        fun onColorChanged(color: RgbColor)
+        fun onColorReceived(color: RgbColor)
+        fun onDimFactorReceived(dimFactor: Int)
         fun onConnectionStateChange(connected: Boolean)
     }
 
@@ -106,10 +111,16 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             characteristic: BluetoothGattCharacteristic?,
             status: Int
         ) {
-            characteristic?.value?.let {
-                val rgbColor = LampEffect.getColorForStaticColorEffect(it)
-                Log.i(TAG, "On charac read")
-                callback.onColorChanged(rgbColor)
+            if (characteristic?.uuid == UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID)) {
+                characteristic?.value?.let {
+                    callback.onDimFactorReceived(it[0].toUByte().toInt())
+                }
+            } else if (characteristic?.uuid == UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID)) {
+                characteristic?.value?.let {
+                    val rgbColor = LampEffect.getColorForStaticColorEffect(it)
+                    callback.onColorReceived(rgbColor)
+                    readDimFactor()
+                }
             }
         }
     }
@@ -118,6 +129,14 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
         val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
             service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+
+        gatt?.readCharacteristic(characteristic)
+    }
+
+    private fun readDimFactor() {
+        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+        val characteristic =
+            service?.getCharacteristic(UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID))
 
         gatt?.readCharacteristic(characteristic)
     }
@@ -180,12 +199,20 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     }
 
     fun callDebugFunction() {
-
         val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
             service?.getCharacteristic(UUID.fromString(LAMP_DEBUG_CHARACTERISTIC_UUID))
 
         characteristic?.setValue("1")
+        gatt?.writeCharacteristic(characteristic)
+    }
+
+    fun setDimFactor(dimFactor: Int) {
+        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+        val characteristic =
+            service?.getCharacteristic(UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID))
+
+        characteristic?.value = byteArrayOf(dimFactor.toByte())
         gatt?.writeCharacteristic(characteristic)
     }
 }

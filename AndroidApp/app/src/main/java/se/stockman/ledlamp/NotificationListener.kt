@@ -34,6 +34,10 @@ class NotificationListener : NotificationListenerService() {
     }
 
     private val lampCallback = object : LedLamp.LampCallback {
+        override fun onDimFactorReceived(dimFactor: Int) {
+            //Do nothing
+        }
+
         override fun onConnectionStateChange(connected: Boolean) {
             if (connected) {
                 if (pendingNotification != null) {
@@ -46,7 +50,7 @@ class NotificationListener : NotificationListenerService() {
             }
         }
 
-        override fun onColorChanged(color: RgbColor) {
+        override fun onColorReceived(color: RgbColor) {
             //Do nothing
         }
     }
