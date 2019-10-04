@@ -18,6 +18,7 @@ LampBLEServer lampServer;
 //Has to be pointer to support polymorphism
 LampEffect* effect;
 StaticColor* staticColorEffect;
+uint8_t currentDimFactor;
 
 boolean isDirty = false;
 unsigned long lastDebounceTime = 0;
@@ -92,6 +93,12 @@ class LampCallbacks: public LampBLEServerCallbacks {
       pendingAlert = true;
     }
 
+    void onSetDimFactor(uint8_t dimFactor) {
+      strip.SetBrightness(dimFactor);
+      strip.Show();
+      currentDimFactor = dimFactor;
+    }
+
     void debugButtonPress() {
       ColorLoop* rainbow = new ColorLoop(&strip);
       effect = rainbow;
@@ -121,7 +128,12 @@ void setup() {
   }
   
   effect->setup();
+  
+  currentDimFactor = Storage::loadDimFactor();
+  strip.SetBrightness(currentDimFactor);
+  
   lampServer.setColorCharacteristicValue(staticColorEffect->color);
+  lampServer.setDimFactorCharacteristicValue(currentDimFactor);
 }
 
 void loop() {
@@ -137,6 +149,7 @@ void loop() {
     if ((millis() - lastDebounceTime) > debounceDelay) {
       Storage::saveStaticColorEffect(staticColorEffect);
       Storage::saveEffect(effect);
+      Storage::saveDimFactor(currentDimFactor);
       isDirty = false;
     }
   }

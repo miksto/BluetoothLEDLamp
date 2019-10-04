@@ -85,6 +85,21 @@ class DebugButtonCallback: public BLECharacteristicCallbacks {
     }
 };
 
+class DimFactorCallback: public BLECharacteristicCallbacks {
+  private:
+    LampBLEServerCallbacks* lampCallbacks;
+
+  public:
+    DimFactorCallback(LampBLEServerCallbacks* lampCallbacks) {
+      this->lampCallbacks = lampCallbacks;
+    }
+
+    void onWrite(BLECharacteristic *pCharacteristic) {
+      uint8_t* bytes = pCharacteristic->getData();
+      lampCallbacks->onSetDimFactor(bytes[0]);
+    }
+};
+
 void LampBLEServer::setup() {
   BLEDevice::init("LedLAMP");
   this->server = BLEDevice::createServer();
@@ -107,6 +122,12 @@ void LampBLEServer::setup() {
                                          BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_WRITE
                                        );
+  this->dimFactorCharacteristic = this->service->createCharacteristic(
+                                         LampBLEUUID::characteristic_dim_factor,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE
+                                       );
+
 
    this->debugButtonCharacteristic = this->service->createCharacteristic(
                                          LampBLEUUID::characteristic_debug,
@@ -120,9 +141,13 @@ void LampBLEServer::setup() {
 }
 
 void LampBLEServer::setColorCharacteristicValue(RgbColor color) {
-  Log::logColor("Setting characteristic value: ",color);
   uint8_t* data = ColorUtils::rgbColorToBytes(color);
   this->staticColorCharacteristic->setValue(data, RGB_COLOR_BYTES_LENGTH);
+}
+
+void LampBLEServer::setDimFactorCharacteristicValue(uint8_t dimFactor) {
+  uint16_t tempDimFactor = dimFactor;
+  this->dimFactorCharacteristic->setValue(tempDimFactor);
 }
 
 void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks, LedStrip* strip) {
@@ -130,4 +155,5 @@ void LampBLEServer::setCallbacks(LampBLEServerCallbacks* callbacks, LedStrip* st
   this->staticColorCharacteristic->setCallbacks(new StaticColorCallback(callbacks, strip));
   this->notificationCharacteristic->setCallbacks(new NotificationAlertCallback(callbacks));
   this->debugButtonCharacteristic->setCallbacks(new DebugButtonCallback(callbacks));
+  this->dimFactorCharacteristic->setCallbacks(new DimFactorCallback(callbacks));
 }

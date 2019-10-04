@@ -17,5 +17,8 @@ StaticColor* loadStaticColorEffect(LedStrip* strip);
 void saveEffect(LampEffect* effect);
 LampEffect* loadEffect(LedStrip* strip);
 
+uint8_t loadDimFactor();
+void saveDimFactor(uint8_t dimFactor);
+
 };
 #endif

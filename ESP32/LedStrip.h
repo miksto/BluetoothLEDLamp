@@ -1,8 +1,8 @@
 #ifndef LAMP_CONSTANTS_H
 #define LAMP_CONSTANTS_H
-#include <NeoPixelBus.h>
+#include <NeoPixelBrightnessBus.h>
 
-typedef NeoPixelBus<NeoGrbwFeature, Neo800KbpsMethod> LedStrip;
+typedef NeoPixelBrightnessBus<NeoGrbwFeature, Neo800KbpsMethod> LedStrip;
 
 namespace LedStripConstants
 {

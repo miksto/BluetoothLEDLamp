@@ -3,9 +3,9 @@
 #include "LedStrip.h"
 
 #include <EEPROM.h>
-
-#define ADDR_EFFECT_ID 0
-#define ADDR_DATA 1
+#define ADDR_DIM_FACTOR 0
+#define ADDR_EFFECT_ID 1
+#define ADDR_DATA 2
 
 #define STATIC_COLOR_INDEX 0
 #define EFFECT_INDEX 4
@@ -69,6 +69,20 @@ void saveEffect(LampEffect* effect) {
 
 LampEffect* loadEffect(LedStrip* strip) {
   return loadEffect(strip, EFFECT_INDEX);
+}
+
+uint8_t loadDimFactor() {
+  uint8_t dimFactor = EEPROM.read(ADDR_DIM_FACTOR);
+  if (dimFactor < 10 || dimFactor > 200) {
+    dimFactor = 100;
+    saveDimFactor(dimFactor);
+  }
+  return dimFactor;
+}
+
+void saveDimFactor(uint8_t dimFactor) {
+  EEPROM.write(ADDR_DIM_FACTOR, dimFactor);
+  EEPROM.commit();
 }
 
 };
