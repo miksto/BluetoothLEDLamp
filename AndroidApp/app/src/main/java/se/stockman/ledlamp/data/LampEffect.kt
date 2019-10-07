@@ -44,7 +44,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     SunsetDataObject(
                         timeDuration = 30,
                         colorInterval = 0.025f,
-                        startHue = 0.05f,
+                        startHue = 0.04f,
                         endHue = 0.95f
                     )
                 )
@@ -54,7 +54,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 )
                 MoodAdapter.sakura -> createGlimmerEffect(
                     RgbColor(174, 21, 31),
-                    RgbColor(60, 60, 120)
+                    RgbColor(80, 60, 120)
                 )
                 MoodAdapter.ruby_room -> createGlimmerEffect(
                     RgbColor(33, 0, 1),
@@ -62,7 +62,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 )
                 MoodAdapter.star_night -> createGlimmerEffect(
                     RgbColor(0, 0, 15),
-                    RgbColor(0, 0, 80)
+                    RgbColor(5, 5, 80)
                 )
                 MoodAdapter.flower_field -> createGradientEffect(
                     RgbColor(200, 0, 170),
