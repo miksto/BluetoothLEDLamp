@@ -26,6 +26,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         private const val esp_32_timed_sunset = 6
         private const val esp_32_fakka_ur = 7
         private const val esp_32_gradient = 8
+        private const val esp_32_patchy_colors_effect = 9
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
@@ -66,6 +67,11 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     RgbColor(200, 0, 170),
                     RgbColor(20, 20, 200)
                 )
+                MoodAdapter.fall -> createPatchyColorsEffect(
+                    RgbColor(150, 25, 0),
+                    RgbColor(200, 170, 0),
+                    RgbColor(80, 200, 0)
+                )
                 else -> throw IllegalArgumentException("Not supported mood id")
             }
         }
@@ -90,6 +96,15 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 EffectAdapter.rotating_lines -> LampEffect(esp_32_rotating_lines, null)
                 else -> throw IllegalArgumentException("Not supported effect id")
             }
+        }
+
+        fun createPatchyColorsEffect(
+            color1: RgbColor,
+            color2: RgbColor,
+            color3: RgbColor
+        ): LampEffect {
+            val data = TripleRgbColorDataObject(color1, color2, color3)
+            return LampEffect(esp_32_patchy_colors_effect, data)
         }
 
         fun createGradientEffect(color1: RgbColor, color2: RgbColor): LampEffect {

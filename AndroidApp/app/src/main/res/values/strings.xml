@@ -20,11 +20,12 @@
     <string name="mood_sakura">Sakura</string>
     <string name="status_connecting_to_lamp">Connecting to Lamp…</string>
     <string name="mood_ruby">Ruby room</string>
-    <string name="star_night">Night sky</string>
+    <string name="mood_star_night">Night sky</string>
     <string name="flowy_colors">Flowy colors</string>
     <string name="mood_timed_sunset">Timed Sunset</string>
     <string name="fekke">FeKkE!</string>
     <string name="fakka_ur">FAKKA UR!!</string>
-    <string name="flower_field">Flower field</string>
+    <string name="mood_flower_field">Flower field</string>
+    <string name="mood_fall">Fall</string>
 
 </resources>

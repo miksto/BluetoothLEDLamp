@@ -24,6 +24,7 @@ class MoodAdapter : BaseAdapter() {
         const val sunset2 = 105
         const val timed_sunset = 106
         const val flower_field = 107
+        const val fall = 108
     }
 
     private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
@@ -65,12 +66,19 @@ class MoodAdapter : BaseAdapter() {
             ),
             EffectItem(
                 star_night,
-                R.string.star_night,
+                R.string.mood_star_night,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
                 flower_field,
-                R.string.flower_field,
+                R.string.mood_flower_field,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                fall,
+                R.string.mood_fall,
+                R.drawable.ic_menu_color_blend
+            )
                 R.drawable.ic_menu_color_blend
             )
         )
