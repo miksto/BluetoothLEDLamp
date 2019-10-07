@@ -73,6 +73,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     RgbColor(200, 170, 0),
                     RgbColor(80, 200, 0)
                 )
+                MoodAdapter.brown_landscape -> createGradientEffect(
+                    RgbColor(110, 33, 0),
+                    RgbColor(110, 53, 0)
+                )
                 MoodAdapter.clouds_effect -> createCloudsEffect(
                     RgbColor(40, 40, 200),
                     RgbColor(150, 150, 200)

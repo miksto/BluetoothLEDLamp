@@ -27,6 +27,7 @@ class MoodAdapter : BaseAdapter() {
         const val fall = 108
         const val clouds_effect = 109
         const val fire_effect = 110
+        const val brown_landscape = 111
     }
 
     private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
@@ -79,6 +80,11 @@ class MoodAdapter : BaseAdapter() {
             EffectItem(
                 fall,
                 R.string.mood_fall,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                brown_landscape,
+                R.string.mood_brown_landscape,
                 R.drawable.ic_menu_color_blend
             ),
             EffectItem(
