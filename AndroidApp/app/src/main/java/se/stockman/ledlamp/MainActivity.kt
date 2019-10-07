@@ -118,6 +118,10 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         menu_effect_picker.setOnClickListener { setFragment(effectFragment) }
         menu_mood_picker.setOnClickListener { setFragment(moodFragment) }
         seek_bar_brightness.setOnSeekBarChangeListener(seekbarListener)
+
+        settings_icon.setOnClickListener {
+            startActivity(SettingsActivity.newIntent(this))
+        }
     }
 
     override fun onStart() {

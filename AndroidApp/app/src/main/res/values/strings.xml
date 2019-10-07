@@ -30,5 +30,7 @@
     <string name="mood_clouds">Clouds</string>
     <string name="mood_fire">Fire</string>
     <string name="mood_brown_landscape">Brown landscape</string>
+    <string name="settings_spotify_integration">Spotify integration</string>
+    <string name="settings_notification_flash">Notification flash</string>
 
 </resources>

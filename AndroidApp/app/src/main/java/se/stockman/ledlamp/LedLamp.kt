@@ -14,6 +14,7 @@ import se.stockman.ledlamp.data.HlsColor
 import se.stockman.ledlamp.data.HlsColorDataObject
 import se.stockman.ledlamp.data.LampEffect
 import se.stockman.ledlamp.data.RgbColor
+import se.stockman.ledlamp.settings.Settings
 import java.util.*
 
 /**
@@ -174,7 +175,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
 
 
     fun notificationAlert(sbn: StatusBarNotification) {
-        if (sbn.packageName.contains(SPOTIFY)) {
+        if (Settings.isSpotifyIntegrationEnabled(context) && sbn.packageName.contains(SPOTIFY)) {
             val drawable = sbn.notification.getLargeIcon().loadDrawable(context)
             val bitmap = (drawable as BitmapDrawable).bitmap
             val palette = Palette.from(bitmap).generate()
@@ -183,7 +184,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                 val color = RgbColor(it.red, it.green, it.blue)
                 setColor(color)
             }
-        } else {
+        } else if (Settings.isNotificationFlashEnabled(context)){
             val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
             val characteristic =
                 service?.getCharacteristic(UUID.fromString(LAMP_NOTIFICATION_CHARACTERISTIC_UUID))

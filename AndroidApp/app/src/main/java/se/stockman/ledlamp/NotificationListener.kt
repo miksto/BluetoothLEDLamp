@@ -65,15 +65,13 @@ class NotificationListener : NotificationListenerService() {
 
     private fun handleNotificationChange(sbn: StatusBarNotification?) {
         sbn?.let {
-            if (it.packageName.contains(LedLamp.SPOTIFY)) {
-                Log.i(TAG, "Handling notification")
-                if (ledLamp.hasDeviceWithActiveConnection()) {
-                    ledLamp.notificationAlert(it)
-                    ledLamp.disconnect()
-                } else {
-                    pendingNotification = it
-                    connectToLamp()
-                }
+            Log.i(TAG, "Handling notification")
+            if (ledLamp.hasDeviceWithActiveConnection()) {
+                ledLamp.notificationAlert(it)
+                ledLamp.disconnect()
+            } else {
+                pendingNotification = it
+                connectToLamp()
             }
         }
     }

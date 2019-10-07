@@ -20,6 +20,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <receiver
             android:name=".BootBroadcastReceiver"
             android:directBootAware="true"
