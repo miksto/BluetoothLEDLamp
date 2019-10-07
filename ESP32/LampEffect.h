@@ -15,6 +15,7 @@ namespace LampEffectId {
   const uint8_t stroboscope_effect = 7;
   const uint8_t gradient_effect = 8;
   const uint8_t patchy_colors_effect = 9;
+  const uint8_t clouds_effect = 10;
 };
 
 namespace LampEffectEepromDataSize {
@@ -28,6 +29,7 @@ namespace LampEffectEepromDataSize {
   const uint8_t stroboscope_effect = 0;
   const uint8_t gradient_effect = RGB_COLOR_BYTES_LENGTH * 2;
   const uint8_t patchy_colors_effect = RGB_COLOR_BYTES_LENGTH * 3;
+  const uint8_t clouds_effect = RGB_COLOR_BYTES_LENGTH * 2;
 };
 
 class LampEffect {

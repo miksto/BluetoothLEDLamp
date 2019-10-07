@@ -9,6 +9,7 @@
 #include "StroboscopeEffect.h"
 #include "GradientEffect.h"
 #include "PatchyColorsEffect.h"
+#include "CloudsEffect.h"
 
 LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
   uint8_t effectId = bytes[0];
@@ -44,6 +45,8 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
     case LampEffectId::gradient_effect: return GradientEffect::fromBytes(strip, effectData);
 
     case LampEffectId::patchy_colors_effect: return PatchyColorsEffect::fromBytes(strip, effectData);
+
+    case LampEffectId::clouds_effect: return CloudsEffect::fromBytes(strip, effectData);
   }
   Serial.print("Invalid effectId: ");
   Serial.println(effectId);
@@ -71,6 +74,8 @@ uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
     case LampEffectId::gradient_effect: return LampEffectEepromDataSize::gradient_effect;
 
     case LampEffectId::patchy_colors_effect: return LampEffectEepromDataSize::patchy_colors_effect;
+
+    case LampEffectId::clouds_effect: return LampEffectEepromDataSize::clouds_effect;
   }
   return LampEffectEepromDataSize::beacon_light;
 }

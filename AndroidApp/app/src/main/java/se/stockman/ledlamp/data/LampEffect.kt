@@ -27,6 +27,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         private const val esp_32_fakka_ur = 7
         private const val esp_32_gradient = 8
         private const val esp_32_patchy_colors_effect = 9
+        private const val esp_32_clouds_effect = 10
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
@@ -72,6 +73,14 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     RgbColor(200, 170, 0),
                     RgbColor(80, 200, 0)
                 )
+                MoodAdapter.clouds_effect -> createCloudsEffect(
+                    RgbColor(40, 40, 200),
+                    RgbColor(150, 150, 200)
+                )
+                MoodAdapter.fire_effect -> createCloudsEffect(
+                    RgbColor(200, 25, 0),
+                    RgbColor(200, 8, 0)
+                )
                 else -> throw IllegalArgumentException("Not supported mood id")
             }
         }
@@ -96,6 +105,11 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 EffectAdapter.rotating_lines -> LampEffect(esp_32_rotating_lines, null)
                 else -> throw IllegalArgumentException("Not supported effect id")
             }
+        }
+
+        fun createCloudsEffect(color1: RgbColor, color2: RgbColor): LampEffect {
+            val data = DualRgbColorDataObject(color1, color2)
+            return LampEffect(esp_32_clouds_effect, data)
         }
 
         fun createPatchyColorsEffect(

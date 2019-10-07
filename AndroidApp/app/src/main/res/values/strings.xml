@@ -27,5 +27,7 @@
     <string name="fakka_ur">FAKKA UR!!</string>
     <string name="mood_flower_field">Flower field</string>
     <string name="mood_fall">Fall</string>
+    <string name="mood_clouds">Clouds</string>
+    <string name="mood_fire">Fire</string>
 
 </resources>
