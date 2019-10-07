@@ -7,6 +7,7 @@
 #include "GlimmeringEffect.h"
 #include "SunsetEffect.h"
 #include "StroboscopeEffect.h"
+#include "GradientEffect.h"
 
 LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
   uint8_t effectId = bytes[0];
@@ -38,6 +39,8 @@ LampEffect* LampEffect::createEffect(LedStrip* strip, uint8_t* bytes) {
     case LampEffectId::sunset_effect: return SunsetEffect::fromBytes(strip, effectData);
 
     case LampEffectId::stroboscope_effect: return new StroboscopeEffect(strip);
+
+    case LampEffectId::gradient_effect: return GradientEffect::fromBytes(strip, effectData);
   }
   Serial.print("Invalid effectId: ");
   Serial.println(effectId);
@@ -61,6 +64,8 @@ uint8_t LampEffect::dataSizeForEffectId(uint8_t effectId) {
     case LampEffectId::sunset_effect: return LampEffectEepromDataSize::sunset_effect;
     
     case LampEffectId::stroboscope_effect: return LampEffectEepromDataSize::stroboscope_effect;
+
+    case LampEffectId::gradient_effect: return LampEffectEepromDataSize::gradient_effect;
   }
   return LampEffectEepromDataSize::beacon_light;
 }

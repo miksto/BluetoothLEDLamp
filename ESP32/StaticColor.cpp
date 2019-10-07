@@ -11,16 +11,13 @@ StaticColor::StaticColor(LedStrip* strip, RgbColor color) : LampEffect(strip, La
 }
 
 void StaticColor::setup() {
-  
   RgbwColor rgbwColor = ColorUtils::rgbToRgbw(this->color);
-  Log::logColor("setting up1", this->color);
-  Log::logColor("setting up1", rgbwColor);
   this->strip->ClearTo(rgbwColor);
   this->strip->Show();
 }
 
 void StaticColor::next() {
-  delay(500);
+  delay(40);
 }
 
 uint8_t* StaticColor::toBytes() {

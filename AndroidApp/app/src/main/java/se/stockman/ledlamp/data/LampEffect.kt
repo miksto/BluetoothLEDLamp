@@ -25,6 +25,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         private const val esp_32_glimmer_effect = 5
         private const val esp_32_timed_sunset = 6
         private const val esp_32_fakka_ur = 7
+        private const val esp_32_gradient = 8
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
@@ -45,7 +46,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                         endHue = 0.95f
                     )
                 )
-                MoodAdapter.woods -> createGlimmerEffect(RgbColor(0, 25, 1), RgbColor(0, 0, 0))
+                MoodAdapter.woods -> createGlimmerEffect(
+                    RgbColor(0, 25, 1),
+                    RgbColor(0, 0, 0)
+                )
                 MoodAdapter.sakura -> createGlimmerEffect(
                     RgbColor(174, 21, 31),
                     RgbColor(60, 60, 120)
@@ -57,6 +61,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 MoodAdapter.star_night -> createGlimmerEffect(
                     RgbColor(0, 0, 15),
                     RgbColor(0, 0, 80)
+                )
+                MoodAdapter.flower_field -> createGradientEffect(
+                    RgbColor(200, 0, 170),
+                    RgbColor(20, 20, 200)
                 )
                 else -> throw IllegalArgumentException("Not supported mood id")
             }
@@ -84,12 +92,15 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
             }
         }
 
+        fun createGradientEffect(color1: RgbColor, color2: RgbColor): LampEffect {
+            val data = DualRgbColorDataObject(color1, color2)
+            return LampEffect(esp_32_gradient, data)
+        }
 
         fun createGlimmerEffect(primaryColor: RgbColor, secondary: RgbColor): LampEffect {
             val data = DualRgbColorDataObject(primaryColor, secondary)
             return LampEffect(esp_32_glimmer_effect, data)
         }
-
 
         fun createStaticColorEffect(color: RgbColor): LampEffect {
             val data = RgbColorDataObject(color)
