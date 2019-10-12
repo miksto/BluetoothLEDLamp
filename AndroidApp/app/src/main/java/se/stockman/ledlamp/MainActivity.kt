@@ -128,7 +128,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         super.onStart()
         val permission = PermissionChecker.checkSelfPermission(
             this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION
         )
 
         val notificationAccessEnabled =
@@ -139,7 +139,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         } else {
             when (permission) {
                 PermissionChecker.PERMISSION_GRANTED -> connectToLampIfNecessary()
-                else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+                else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), 1)
             }
         }
     }

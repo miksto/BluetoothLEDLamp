@@ -22,6 +22,10 @@ class NotificationListener : NotificationListenerService() {
         }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        return START_STICKY
+    }
 
     private var pendingNotification: StatusBarNotification? = null
     private val lampDeviceFoundCallback = object : LampDeviceDiscovery.Callback {

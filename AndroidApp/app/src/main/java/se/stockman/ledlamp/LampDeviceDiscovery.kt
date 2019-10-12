@@ -48,7 +48,7 @@ class LampDeviceDiscovery(val callback: Callback) {
     }
 
     fun stop() {
-        bluetoothLeScanner.stopScan(scanCallback);
+        bluetoothLeScanner.stopScan(scanCallback)
     }
 
     private val scanCallback = object : ScanCallback() {

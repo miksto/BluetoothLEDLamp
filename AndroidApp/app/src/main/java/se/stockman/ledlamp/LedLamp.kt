@@ -46,7 +46,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
 
     fun connectToDevice(device: BluetoothDevice, context: Context) {
         this.device = device
-        gatt = device.connectGatt(context, true, gattCallback)
+        gatt = device.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         if (device.bondState == BluetoothDevice.BOND_NONE) {
             device.createBond()
         }
@@ -184,7 +184,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                 val color = RgbColor(it.red, it.green, it.blue)
                 setColor(color)
             }
-        } else if (Settings.isNotificationFlashEnabled(context)){
+        } else if (Settings.isNotificationFlashEnabled(context)) {
             val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
             val characteristic =
                 service?.getCharacteristic(UUID.fromString(LAMP_NOTIFICATION_CHARACTERISTIC_UUID))
