@@ -84,7 +84,7 @@ void GlimmeringEffect::next() {
 }
 
 uint8_t* GlimmeringEffect::toBytes() {
-  uint8_t *bytes = new uint8_t[this->eepromDataSize];
+  uint8_t* bytes = new uint8_t[this->eepromDataSize];
   uint8_t* color1bytes = ColorUtils::rgbColorToBytes(this->primaryColor);
   uint8_t* color2bytes = ColorUtils::rgbColorToBytes(this->secondaryColor);
   for (int i = 0; i < RGB_COLOR_BYTES_LENGTH; i++) {
@@ -94,8 +94,8 @@ uint8_t* GlimmeringEffect::toBytes() {
   for (int i = 0; i < RGB_COLOR_BYTES_LENGTH; i++) {
     bytes[RGB_COLOR_BYTES_LENGTH + i] = color2bytes[i];
   }
-  delete color1bytes;
-  delete color2bytes;
+  delete[] color1bytes;
+  delete[] color2bytes;
   return bytes;
 }
 

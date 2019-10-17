@@ -47,8 +47,8 @@ uint8_t* GradientEffect::toBytes() {
   for (int i = 0; i < RGB_COLOR_BYTES_LENGTH; i++) {
     bytes[RGB_COLOR_BYTES_LENGTH + i] = color2bytes[i];
   }
-  delete color1bytes;
-  delete color2bytes;
+  delete[] color1bytes;
+  delete[] color2bytes;
   return bytes;
 }
 

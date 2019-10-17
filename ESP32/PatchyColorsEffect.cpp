@@ -50,9 +50,9 @@ uint8_t* PatchyColorsEffect::toBytes() {
   for (int i = 0; i < RGB_COLOR_BYTES_LENGTH; i++) {
     bytes[2 * RGB_COLOR_BYTES_LENGTH + i] = color3bytes[i];
   }
-  delete color1bytes;
-  delete color2bytes;
-  delete color3bytes;
+  delete[] color1bytes;
+  delete[] color2bytes;
+  delete[] color3bytes;
   return bytes;
 }
 

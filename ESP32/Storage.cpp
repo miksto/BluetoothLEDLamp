@@ -31,6 +31,7 @@ void saveEffect(LampEffect* effect, uint8_t start_index) {
       EEPROM.write(start_index + ADDR_DATA + i, bytes[i]);
       Serial.println(bytes[i]);
     }
+    delete[] bytes;
   }
   EEPROM.commit();
 }
@@ -41,8 +42,7 @@ LampEffect* loadEffect(LedStrip* strip, uint8_t start_index) {
   Serial.print("Loading effect with byte size: ");
   Serial.println(eepromDataSize);
 
-  uint8_t* bytes;
-  bytes = new uint8_t[eepromDataSize + 1];
+  uint8_t bytes[eepromDataSize + 1];
   Serial.println("loadEffect");
   for (int i = 0; i < eepromDataSize + 1; i++) {
     bytes[i] = EEPROM.read(start_index + ADDR_EFFECT_ID + i);
@@ -51,7 +51,6 @@ LampEffect* loadEffect(LedStrip* strip, uint8_t start_index) {
 
   LampEffect* lampEffect = LampEffect::createEffect(strip, bytes);
   Serial.println("lampEffect created");
-  delete bytes;
   return lampEffect;
 }
 
