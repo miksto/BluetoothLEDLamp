@@ -115,7 +115,6 @@ void setup() {
   lampServer.setup();
   lampServer.setCallbacks(new LampCallbacks(), &strip);
 
-  notificationAlert();
   staticColorEffect = Storage::loadStaticColorEffect(&strip);
   if (staticColorEffect == nullptr) {
     RgbColor color(100, 100, 100);
