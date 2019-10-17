@@ -147,7 +147,10 @@ void loop() {
   if (isDirty) {
     if ((millis() - lastDebounceTime) > debounceDelay) {
       Storage::saveStaticColorEffect(staticColorEffect);
-      Storage::saveEffect(effect);
+      //Too much data in PixelControlEffect for EEPROM
+      if (effect->id != LampEffectId::pixel_control_effect) {
+        Storage::saveEffect(effect);
+      }
       Storage::saveDimFactor(currentDimFactor);
       isDirty = false;
     }

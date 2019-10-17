@@ -16,6 +16,7 @@ namespace LampEffectId {
   const uint8_t gradient_effect = 8;
   const uint8_t patchy_colors_effect = 9;
   const uint8_t clouds_effect = 10;
+  const uint8_t pixel_control_effect = 11;
 };
 
 namespace LampEffectEepromDataSize {
@@ -30,6 +31,7 @@ namespace LampEffectEepromDataSize {
   const uint8_t gradient_effect = RGB_COLOR_BYTES_LENGTH * 2;
   const uint8_t patchy_colors_effect = RGB_COLOR_BYTES_LENGTH * 3;
   const uint8_t clouds_effect = RGB_COLOR_BYTES_LENGTH * 2;
+  const uint8_t pixel_control_effect = RGB_COLOR_BYTES_LENGTH * LedStripConstants::led_count;
 };
 
 class LampEffect {

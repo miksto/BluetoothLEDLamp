@@ -32,5 +32,6 @@
     <string name="mood_brown_landscape">Brown landscape</string>
     <string name="settings_spotify_integration">Spotify integration</string>
     <string name="settings_notification_flash">Notification flash</string>
+    <string name="pixel_control">pixel_control</string>
 
 </resources>

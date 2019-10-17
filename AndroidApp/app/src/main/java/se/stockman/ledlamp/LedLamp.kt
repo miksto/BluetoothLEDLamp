@@ -82,7 +82,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
-                    gatt?.discoverServices()
+                    gatt?.requestMtu(517)
                     Log.i(TAG, "Connected to GATT server.")
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
@@ -93,11 +93,17 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             }
         }
 
+        override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+            super.onMtuChanged(gatt, mtu, status)
+            Log.i(TAG, "onMtuChanged success: " + (status == BluetoothGatt.GATT_SUCCESS))
+            gatt?.discoverServices()
+        }
+
         override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
             when (status) {
                 BluetoothGatt.GATT_SUCCESS -> {
                     connected = true
-                    callback.onConnectionStateChange(connected);
+                    callback.onConnectionStateChange(connected)
                     readCurrentColor()
                 }
                 else -> {
@@ -170,6 +176,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             service?.getCharacteristic(UUID.fromString(LAMP_EFFECT_CHARACTERISTIC_UUID))
 
         characteristic?.value = effect.toByteArray()
+        characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         gatt?.writeCharacteristic(characteristic)
     }
 

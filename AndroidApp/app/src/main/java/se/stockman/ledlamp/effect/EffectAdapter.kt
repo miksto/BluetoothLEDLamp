@@ -23,6 +23,7 @@ class EffectAdapter : BaseAdapter() {
         const val flowy_colors = 5
         const val fekke = 6
         const val fakka_ur = 7
+        const val pixel_control = 8
     }
 
     private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
@@ -65,6 +66,11 @@ class EffectAdapter : BaseAdapter() {
             EffectItem(
                 fakka_ur,
                 R.string.fakka_ur,
+                R.drawable.ic_menu_color_blend
+            ),
+            EffectItem(
+                pixel_control,
+                R.string.pixel_control,
                 R.drawable.ic_menu_color_blend
             )
         )

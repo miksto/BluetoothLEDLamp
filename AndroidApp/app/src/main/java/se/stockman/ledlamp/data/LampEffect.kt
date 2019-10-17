@@ -28,6 +28,7 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
         private const val esp_32_gradient = 8
         private const val esp_32_patchy_colors_effect = 9
         private const val esp_32_clouds_effect = 10
+        private const val esp_32_pixel_control_effect = 11
 
         fun moodFromId(id: Int): LampEffect {
             return when (id) {
@@ -107,6 +108,10 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 EffectAdapter.beacon_light -> LampEffect(esp_32_beacon_light, null)
                 EffectAdapter.color_loop -> LampEffect(esp_32_color_loop, null)
                 EffectAdapter.rotating_lines -> LampEffect(esp_32_rotating_lines, null)
+                EffectAdapter.pixel_control -> LampEffect(
+                    esp_32_pixel_control_effect,
+                    PixelControlDataObject.createRandomPixelImage()
+                )
                 else -> throw IllegalArgumentException("Not supported effect id")
             }
         }

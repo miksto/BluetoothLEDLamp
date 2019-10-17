@@ -102,6 +102,8 @@ class DimFactorCallback: public BLECharacteristicCallbacks {
 
 void LampBLEServer::setup() {
   BLEDevice::init("LedLAMP");
+  BLEDevice::setMTU(517);
+
   this->server = BLEDevice::createServer();
   this->service = this->server->createService(LampBLEUUID::service);
 
