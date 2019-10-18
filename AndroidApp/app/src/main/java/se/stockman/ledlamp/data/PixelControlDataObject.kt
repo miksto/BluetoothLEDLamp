@@ -18,7 +18,12 @@ class PixelControlDataObject(val colors: Array<RgbColor>) : DataObject {
             val pixels = Array(121) { i ->
                 val y = (i / 7) * strideY
                 val x = (i % 7) * strideX
-                val pixel = bitmap.getPixel(x, y)
+                val floats = FloatArray(3)
+
+                Color.colorToHSV(bitmap.getPixel(x, y), floats)
+                floats[1] = minOf(floats[1] * 3f, 1f)
+                val pixel = Color.HSVToColor(1, floats)
+
                 RgbColor(
                     Color.red(pixel),
                     Color.green(pixel),
