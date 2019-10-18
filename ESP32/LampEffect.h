@@ -24,7 +24,7 @@ namespace LampEffectEepromDataSize {
   const uint8_t beacon_light = 0;
   const uint8_t color_loop = 0;
   const uint8_t rotating_lines = 0;
-  const uint8_t rotating_rainbow = 1;
+  const uint8_t rotating_rainbow = 2;
   const uint8_t glimmering_effect = RGB_COLOR_BYTES_LENGTH * 2;
   const uint8_t sunset_effect = 4;
   const uint8_t stroboscope_effect = 0;
