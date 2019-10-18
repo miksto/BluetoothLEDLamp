@@ -1,5 +1,6 @@
 package se.stockman.ledlamp.data
 
+import android.graphics.Bitmap
 import se.stockman.ledlamp.effect.EffectAdapter
 import se.stockman.ledlamp.mood.MoodAdapter
 
@@ -108,20 +109,23 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                 EffectAdapter.beacon_light -> LampEffect(esp_32_beacon_light, null)
                 EffectAdapter.color_loop -> LampEffect(esp_32_color_loop, null)
                 EffectAdapter.rotating_lines -> LampEffect(esp_32_rotating_lines, null)
-                EffectAdapter.pixel_control -> LampEffect(
-                    esp_32_pixel_control_effect,
-                    PixelControlDataObject.createRandomPixelImage()
-                )
                 else -> throw IllegalArgumentException("Not supported effect id")
             }
         }
 
-        fun createCloudsEffect(color1: RgbColor, color2: RgbColor): LampEffect {
+        fun fromBitmap(bitmap: Bitmap): LampEffect {
+            return LampEffect(
+                esp_32_pixel_control_effect,
+                PixelControlDataObject.fromImage(bitmap)
+            )
+        }
+
+        private fun createCloudsEffect(color1: RgbColor, color2: RgbColor): LampEffect {
             val data = DualRgbColorDataObject(color1, color2)
             return LampEffect(esp_32_clouds_effect, data)
         }
 
-        fun createPatchyColorsEffect(
+        private fun createPatchyColorsEffect(
             color1: RgbColor,
             color2: RgbColor,
             color3: RgbColor
@@ -130,12 +134,12 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
             return LampEffect(esp_32_patchy_colors_effect, data)
         }
 
-        fun createGradientEffect(color1: RgbColor, color2: RgbColor): LampEffect {
+        private fun createGradientEffect(color1: RgbColor, color2: RgbColor): LampEffect {
             val data = DualRgbColorDataObject(color1, color2)
             return LampEffect(esp_32_gradient, data)
         }
 
-        fun createGlimmerEffect(primaryColor: RgbColor, secondary: RgbColor): LampEffect {
+        private fun createGlimmerEffect(primaryColor: RgbColor, secondary: RgbColor): LampEffect {
             val data = DualRgbColorDataObject(primaryColor, secondary)
             return LampEffect(esp_32_glimmer_effect, data)
         }

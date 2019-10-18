@@ -8,13 +8,23 @@
     android:background="@drawable/app_background"
     tools:context=".MainActivity">
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="0dp"
         android:layout_height="56dp"
+        android:gravity="end"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/gallery_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingRight="16dp"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_gallery" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/settings_icon"
@@ -25,7 +35,7 @@
             android:scaleType="centerInside"
             android:src="@android:drawable/ic_menu_preferences" />
 
-    </FrameLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/fragment_container"

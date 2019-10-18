@@ -1,13 +1,31 @@
 package se.stockman.ledlamp.data
 
+import android.graphics.Bitmap
+import android.graphics.Color
+
+
 /**
  * Created by Mikael Stockman on 2019-10-17.
  */
 class PixelControlDataObject(val colors: Array<RgbColor>) : DataObject {
 
     companion object {
-        fun createRandomPixelImage(): PixelControlDataObject {
-            val pixels = Array(121) { i -> RgbColor(if (i%2==0) 100 else 0, if (i%3==0) 100 else 0, if (i%5==0) 100 else 0) }
+        fun fromImage(bitmap: Bitmap): PixelControlDataObject {
+            val strideX = bitmap.width / 7
+            val strideY = bitmap.height / 18
+
+
+            val pixels = Array(121) { i ->
+                val y = (i / 7) * strideY
+                val x = (i % 7) * strideX
+                val pixel = bitmap.getPixel(x, y)
+                RgbColor(
+                    Color.red(pixel),
+                    Color.green(pixel),
+                    Color.blue(pixel)
+                )
+            }
+            pixels.reverse()
             return PixelControlDataObject(pixels)
         }
     }

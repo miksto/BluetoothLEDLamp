@@ -1,17 +1,20 @@
 package se.stockman.ledlamp
 
 import android.Manifest
+import android.app.Activity
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
+import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
@@ -59,6 +62,9 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     companion object {
         val TAG: String? = MainActivity::class.simpleName
+        const val REQUEST_GET_SINGLE_FILE = 1
+        const val REQUEST_LOCATION_PERMISSION = 2
+        const val REQUEST_STORAGE_PERMISSION = 3
     }
 
 
@@ -122,6 +128,22 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         settings_icon.setOnClickListener {
             startActivity(SettingsActivity.newIntent(this))
         }
+
+        gallery_icon.setOnClickListener {
+            PermissionChecker.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            val permission = ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+            when (permission) {
+                PackageManager.PERMISSION_GRANTED -> openImagePicker()
+                else -> requestPermissions(
+                    arrayOf(
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ), REQUEST_STORAGE_PERMISSION
+                )
+            }
+        }
+
     }
 
     override fun onStart() {
@@ -139,7 +161,12 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         } else {
             when (permission) {
                 PermissionChecker.PERMISSION_GRANTED -> connectToLampIfNecessary()
-                else -> requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION), 1)
+                else -> requestPermissions(
+                    arrayOf(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ), REQUEST_LOCATION_PERMISSION
+                )
             }
         }
     }
@@ -153,36 +180,72 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         }
     }
 
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "image/*"
+        startActivityForResult(
+            Intent.createChooser(intent, getString(R.string.title_select_image)),
+            REQUEST_GET_SINGLE_FILE
+        )
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         when (requestCode) {
-            1 -> when (grantResults) {
-                intArrayOf(PackageManager.PERMISSION_GRANTED) -> {
-                    Log.d("ScanDeviceActivity", "onRequestPermissionsResult(PERMISSION_GRANTED)")
-                    lampFinder.findDevice()
+            REQUEST_LOCATION_PERMISSION ->
+                when (grantResults) {
+                    intArrayOf(PackageManager.PERMISSION_GRANTED) ->
+                        lampFinder.findDevice()
+                    else ->
+                        Log.d(
+                            "ScanDeviceActivity",
+                            "onRequestPermissionsResult(not PERMISSION_GRANTED)"
+                        )
                 }
-                else -> {
-                    Log.d(
+            REQUEST_STORAGE_PERMISSION ->
+                when (grantResults) {
+                    intArrayOf(PackageManager.PERMISSION_GRANTED) -> openImagePicker()
+                    else -> Log.d(
                         "ScanDeviceActivity",
                         "onRequestPermissionsResult(not PERMISSION_GRANTED)"
                     )
                 }
-            }
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_GET_SINGLE_FILE ->
+                when (resultCode) {
+
+                    Activity.RESULT_OK ->
+                        data?.data.let {
+                            val bitmap = MediaStore.Images.Media.getBitmap(
+                                contentResolver,
+                                it
+                            )
+                            ledLamp.setEffect(LampEffect.fromBitmap(bitmap))
+                        }
+                    else -> Log.i(TAG, "Did not successfully retrieve image")
+                }
+            else -> Log.i(TAG, "Unknown request code in onActivityResult: $requestCode")
         }
     }
 
     override fun onStop() {
         super.onStop()
         lampFinder.stop()
-        ledLamp.disconnect()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        ledLamp.disconnect()
         ledLamp.destroy()
     }
 

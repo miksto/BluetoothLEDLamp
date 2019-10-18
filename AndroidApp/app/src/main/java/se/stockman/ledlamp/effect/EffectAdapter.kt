@@ -67,11 +67,6 @@ class EffectAdapter : BaseAdapter() {
                 fakka_ur,
                 R.string.fakka_ur,
                 R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                pixel_control,
-                R.string.pixel_control,
-                R.drawable.ic_menu_color_blend
             )
         )
     }
