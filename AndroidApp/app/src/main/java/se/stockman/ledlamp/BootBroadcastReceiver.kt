@@ -7,6 +7,7 @@ import android.content.Intent
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */
+@ExperimentalUnsignedTypes
 class BootBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED

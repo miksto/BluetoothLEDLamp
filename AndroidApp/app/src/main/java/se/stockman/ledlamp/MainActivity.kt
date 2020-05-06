@@ -26,6 +26,7 @@ import se.stockman.ledlamp.effect.EffectFragment
 import se.stockman.ledlamp.mood.MoodFragment
 
 
+@ExperimentalUnsignedTypes
 class MainActivity : ColorFragment.OnFragmentInteractionListener,
     EffectFragment.OnEffectSelectedListener, MoodFragment.OnMoodSelectedListener,
     AppCompatActivity() {

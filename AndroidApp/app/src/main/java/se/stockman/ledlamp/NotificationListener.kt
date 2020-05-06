@@ -12,6 +12,7 @@ import se.stockman.ledlamp.data.RgbColor
  * Created by Mikael Stockman on 2019-09-07.
  */
 
+@ExperimentalUnsignedTypes
 class NotificationListener : NotificationListenerService() {
 
     companion object {

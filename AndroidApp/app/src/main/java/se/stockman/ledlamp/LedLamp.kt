@@ -27,6 +27,7 @@ const val LAMP_NOTIFICATION_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-587ff
 const val LAMP_DEBUG_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-777ffef47e9c"
 const val LAMP_DIM_FACTOR_CHARACTERISTIC_UUID = "836457c0-1c54-419f-945b-587ffef47e9c"
 
+@ExperimentalUnsignedTypes
 class LedLamp(private val context: Context, private val callback: LampCallback) {
     companion object {
         val TAG: String? = LedLamp::class.simpleName
