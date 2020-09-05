@@ -22,25 +22,20 @@ class LampDeviceDiscovery(val callback: Callback) {
     private val lampScanFilter =
         ScanFilter.Builder().setDeviceAddress(BLE_DEVICE_MAC).build()
 
-    private val bluetoothLeScanner: BluetoothLeScanner
-        get() {
-            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            return bluetoothAdapter.bluetoothLeScanner
-        }
+    private val bluetoothAdapter: BluetoothAdapter? by lazy { BluetoothAdapter.getDefaultAdapter() }
+    private val bluetoothLeScanner by lazy { bluetoothAdapter?.bluetoothLeScanner }
 
     fun findDevice() {
-        val pairedDevices: Set<BluetoothDevice>? =
-            BluetoothAdapter.getDefaultAdapter().bondedDevices
-        val device =
-            pairedDevices?.find { bluetoothDevice -> bluetoothDevice.address == BLE_DEVICE_MAC }
+        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+        val device = pairedDevices?.find { bluetoothDevice -> bluetoothDevice.address == BLE_DEVICE_MAC }
 
         if (device != null) {
             Log.i(TAG, "Found bonded device")
             this.callback.onDeviceFound(device)
         } else {
             Log.i(TAG, "No bonded device, starting scanning")
-            bluetoothLeScanner.startScan(
-                mutableListOf<ScanFilter>(lampScanFilter),
+            bluetoothLeScanner?.startScan(
+                listOf(lampScanFilter),
                 ScanSettings.Builder().build(),
                 scanCallback
             )
@@ -48,13 +43,13 @@ class LampDeviceDiscovery(val callback: Callback) {
     }
 
     fun stop() {
-        bluetoothLeScanner.stopScan(scanCallback)
+        bluetoothLeScanner?.stopScan(scanCallback)
     }
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             Log.d(TAG, "onScanResult(): ${result?.device?.address} - ${result?.device?.name}")
-            bluetoothLeScanner.stopScan(this)
+            bluetoothLeScanner?.stopScan(this)
             result?.device?.let {
                 callback.onDeviceFound(it)
             }
