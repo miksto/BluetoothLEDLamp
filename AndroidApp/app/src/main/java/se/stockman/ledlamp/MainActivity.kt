@@ -7,11 +7,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.SeekBar
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -30,6 +32,7 @@ import se.stockman.ledlamp.mood.MoodFragment
 class MainActivity : ColorFragment.OnFragmentInteractionListener,
     EffectFragment.OnEffectSelectedListener, MoodFragment.OnMoodSelectedListener,
     AppCompatActivity() {
+
     override fun onMoodSelected(effectId: Int) {
         val effect = LampEffect.moodFromId(effectId)
         ledLamp.setEffect(effect)
@@ -40,7 +43,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         ledLamp.setEffect(effect)
     }
 
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
     private val colorFragment = ColorFragment.newInstance()
     private val effectFragment = EffectFragment.newInstance()
     private val moodFragment = MoodFragment.newInstance()
@@ -49,7 +52,6 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
         transaction.commit()
-
     }
 
     override fun onSetColor(color: RgbColor) {
@@ -63,11 +65,14 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     companion object {
         val TAG: String? = MainActivity::class.simpleName
-        const val REQUEST_GET_SINGLE_FILE = 1
-        const val REQUEST_LOCATION_PERMISSION = 2
-        const val REQUEST_STORAGE_PERMISSION = 3
-        const val REQUEST_BL_SCAN_PERMISSION = 4
-        const val REQUEST_BL_CONNECT_PERMISSION = 5
+
+        private val bluetoothPermissions = listOf(
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_SCAN,
+        )
+
+        const val REQUEST_STORAGE_PERMISSION = 1
+        const val REQUEST_BLUETOOTH_PERMISSION = 3
     }
 
 
@@ -118,6 +123,18 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
     private lateinit var binding: ActivityMainBinding
     private lateinit var bottomMenuBinding: BottomMenuBinding
 
+    private val imagePickerResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data.let {
+                    val bitmap = MediaStore.Images.Media.getBitmap(
+                        contentResolver,
+                        it
+                    )
+                    ledLamp.setEffect(LampEffect.fromBitmap(bitmap))
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,57 +172,15 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     override fun onStart() {
         super.onStart()
+        checkPermissionsAndConnect()
+    }
 
-        val notificationAccessEnabled =
-            NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
-
-        if (!notificationAccessEnabled) {
-            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-            startActivity(intent)
-            return
+    private fun checkPermissionsAndConnect() {
+        when {
+            !isNotificationAccessGranted() -> startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            !isAllBluetoothPermissionsGranted() -> requestAllBluetoothPermissions()
+            else -> connectToLampIfNecessary()
         }
-
-        if (PermissionChecker.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-            ) != PermissionChecker.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ), REQUEST_LOCATION_PERMISSION
-            )
-            return
-        }
-
-        if (PermissionChecker.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT,
-            ) != PermissionChecker.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ), REQUEST_BL_CONNECT_PERMISSION
-            )
-            return
-        }
-
-        if (PermissionChecker.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_SCAN,
-            ) != PermissionChecker.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.BLUETOOTH_SCAN
-                ), REQUEST_BL_SCAN_PERMISSION
-            )
-            return
-        }
-
-        connectToLampIfNecessary()
     }
 
     private fun connectToLampIfNecessary() {
@@ -221,10 +196,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
-        startActivityForResult(
-            Intent.createChooser(intent, getString(R.string.title_select_image)),
-            REQUEST_GET_SINGLE_FILE
-        )
+        imagePickerResult.launch(intent)
     }
 
     override fun onRequestPermissionsResult(
@@ -233,17 +205,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         grantResults: IntArray
     ) {
         when (requestCode) {
-            REQUEST_LOCATION_PERMISSION ->
-                when (grantResults) {
-                    intArrayOf(PackageManager.PERMISSION_GRANTED) ->
-                        lampFinder.findDevice()
-
-                    else ->
-                        Log.d(
-                            "ScanDeviceActivity",
-                            "onRequestPermissionsResult(not PERMISSION_GRANTED)"
-                        )
-                }
+            REQUEST_BLUETOOTH_PERMISSION -> checkPermissionsAndConnect()
 
             REQUEST_STORAGE_PERMISSION ->
                 when (grantResults) {
@@ -258,28 +220,6 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            REQUEST_GET_SINGLE_FILE ->
-                when (resultCode) {
-
-                    Activity.RESULT_OK ->
-                        data?.data.let {
-                            val bitmap = MediaStore.Images.Media.getBitmap(
-                                contentResolver,
-                                it
-                            )
-                            ledLamp.setEffect(LampEffect.fromBitmap(bitmap))
-                        }
-
-                    else -> Log.i(TAG, "Did not successfully retrieve image")
-                }
-
-            else -> Log.i(TAG, "Unknown request code in onActivityResult: $requestCode")
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         lampFinder.stop()
@@ -291,4 +231,21 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         ledLamp.destroy()
     }
 
+    private fun isAllBluetoothPermissionsGranted() = bluetoothPermissions.all {
+        PermissionChecker.checkSelfPermission(this, it) == PermissionChecker.PERMISSION_GRANTED
+    }
+
+    private fun requestAllBluetoothPermissions() {
+        requestPermissions(
+            getMissingPermission().toTypedArray(),
+            REQUEST_BLUETOOTH_PERMISSION
+        )
+    }
+
+    private fun getMissingPermission() = bluetoothPermissions.filterNot {
+        PermissionChecker.checkSelfPermission(this, it) == PermissionChecker.PERMISSION_GRANTED
+    }
+
+    private fun isNotificationAccessGranted() =
+        NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
 }

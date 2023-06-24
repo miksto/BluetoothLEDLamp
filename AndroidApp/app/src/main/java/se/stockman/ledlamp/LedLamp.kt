@@ -1,5 +1,6 @@
 package se.stockman.ledlamp
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -32,6 +33,7 @@ const val LAMP_DEBUG_CHARACTERISTIC_UUID = "32e2d7c0-1c54-419f-945b-777ffef47e9c
 const val LAMP_DIM_FACTOR_CHARACTERISTIC_UUID = "836457c0-1c54-419f-945b-587ffef47e9c"
 
 @ExperimentalUnsignedTypes
+@SuppressLint("MissingPermission")
 class LedLamp(private val context: Context, private val callback: LampCallback) {
     companion object {
         val TAG: String? = LedLamp::class.simpleName
@@ -88,11 +90,9 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
                     gatt?.requestMtu(517)
-                    Log.i(TAG, "Connected to GATT server.")
                 }
 
                 BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.i(TAG, "Disconnected from GATT server.")
                     connected = false
                     callback.onConnectionStateChange(connected)
                 }
@@ -101,7 +101,6 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
 
         override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
             super.onMtuChanged(gatt, mtu, status)
-            Log.i(TAG, "onMtuChanged success: " + (status == BluetoothGatt.GATT_SUCCESS))
             gatt?.discoverServices()
         }
 
@@ -121,20 +120,17 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
         }
 
         override fun onCharacteristicRead(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
             status: Int
         ) {
-            if (characteristic?.uuid == UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID)) {
-                characteristic?.value?.let {
-                    callback.onDimFactorReceived(it[0].toUByte().toInt())
-                }
-            } else if (characteristic?.uuid == UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID)) {
-                characteristic?.value?.let {
-                    val rgbColor = LampEffect.getColorForStaticColorEffect(it)
-                    callback.onColorReceived(rgbColor)
-                    readDimFactor()
-                }
+            if (characteristic.uuid == UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID)) {
+                callback.onDimFactorReceived(value[0].toUByte().toInt())
+            } else if (characteristic.uuid == UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID)) {
+                val rgbColor = LampEffect.getColorForStaticColorEffect(value)
+                callback.onColorReceived(rgbColor)
+                readDimFactor()
             }
         }
     }
@@ -143,7 +139,6 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
         val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
             service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
-
         gatt?.readCharacteristic(characteristic)
     }
 
@@ -157,34 +152,44 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
 
     fun setColor(color: HlsColor) {
         color.lightness = Integer.min(color.lightness, 180)
-        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+        val colorDataObject = HlsColorDataObject(color)
         val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+            gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+                ?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+                ?: return
 
-        val byteArray = HlsColorDataObject(color).toByteArray()
-
-        characteristic?.value = byteArray
-        gatt?.writeCharacteristic(characteristic)
+        gatt?.writeCharacteristic(
+            characteristic,
+            colorDataObject.toByteArray(),
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        )
     }
 
     fun setColor(color: RgbColor) {
-        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
-        val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
-
         val effect = LampEffect.createStaticColorEffect(color)
-        characteristic?.value = effect.toByteArray()
-        gatt?.writeCharacteristic(characteristic)
+        val characteristic =
+            gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+                ?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))
+                ?: return
+
+        gatt?.writeCharacteristic(
+            characteristic,
+            effect.toByteArray(),
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        )
     }
 
     fun setEffect(effect: LampEffect) {
-        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_EFFECT_CHARACTERISTIC_UUID))
+            gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+                ?.getCharacteristic(UUID.fromString(LAMP_EFFECT_CHARACTERISTIC_UUID))
+                ?: return
 
-        characteristic?.value = effect.toByteArray()
-        characteristic?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        gatt?.writeCharacteristic(characteristic)
+        gatt?.writeCharacteristic(
+            characteristic,
+            effect.toByteArray(),
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        )
     }
 
 
@@ -193,41 +198,50 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
             val drawable = sbn.notification.getLargeIcon().loadDrawable(context)
             val bitmap = (drawable as BitmapDrawable).bitmap
             val palette = Palette.from(bitmap).generate()
-            val rgb = palette.dominantSwatch?.rgb
-            rgb?.let {
-                val color = RgbColor(it.red, it.green, it.blue)
-                setColor(color)
-            }
+
+            palette.dominantSwatch
+                ?.rgb?.takeUnless { it.red == it.green && it.red == it.blue }
+                ?.let { setColor(RgbColor(it.red, it.green, it.blue)) }
+
         } else if (Settings.isNotificationFlashEnabled(context)) {
-            val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
             val characteristic =
-                service?.getCharacteristic(UUID.fromString(LAMP_NOTIFICATION_CHARACTERISTIC_UUID))
+                gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+                    ?.getCharacteristic(UUID.fromString(LAMP_NOTIFICATION_CHARACTERISTIC_UUID))
+                    ?: return
 
             val bytes = ByteArray(1)
             val r = (1..255).shuffled().first()
             bytes[0] = (r and 0xFF).toByte()
-            characteristic?.value = bytes
-            handler.post {
-                gatt?.writeCharacteristic(characteristic)
-            }
+
+            gatt?.writeCharacteristic(
+                characteristic,
+                bytes,
+                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            )
         }
     }
 
     fun callDebugFunction() {
         val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_DEBUG_CHARACTERISTIC_UUID))
-
-        characteristic?.setValue("1")
-        gatt?.writeCharacteristic(characteristic)
+            service?.getCharacteristic(UUID.fromString(LAMP_DEBUG_CHARACTERISTIC_UUID)) ?: return
+        gatt?.writeCharacteristic(
+            characteristic,
+            "1".toByteArray(),
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        )
     }
 
     fun setDimFactor(dimFactor: Int) {
-        val service = gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
         val characteristic =
-            service?.getCharacteristic(UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID))
+            gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
+                ?.getCharacteristic(UUID.fromString(LAMP_DIM_FACTOR_CHARACTERISTIC_UUID))
+                ?: return
 
-        characteristic?.value = byteArrayOf(dimFactor.toByte())
-        gatt?.writeCharacteristic(characteristic)
+        gatt?.writeCharacteristic(
+            characteristic,
+            byteArrayOf(dimFactor.toByte()),
+            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        )
     }
 }

@@ -1,5 +1,6 @@
 package se.stockman.ledlamp
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
@@ -13,6 +14,7 @@ import android.util.Log
  */
 const val BLE_DEVICE_MAC = "30:AE:A4:CA:DE:76"
 
+@SuppressLint("MissingPermission")
 class LampDeviceDiscovery(val callback: Callback) {
     companion object {
         val TAG: String? = LampDeviceDiscovery::class.simpleName
