@@ -2,11 +2,14 @@ package se.stockman.ledlamp
 
 import android.Manifest
 import android.app.Activity
-import android.bluetooth.BluetoothDevice
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
@@ -29,40 +32,11 @@ import se.stockman.ledlamp.mood.MoodFragment
 
 
 @ExperimentalUnsignedTypes
-class MainActivity : ColorFragment.OnFragmentInteractionListener,
-    EffectFragment.OnEffectSelectedListener, MoodFragment.OnMoodSelectedListener,
+class MainActivity :
+    ColorFragment.OnFragmentInteractionListener,
+    EffectFragment.OnEffectSelectedListener,
+    MoodFragment.OnMoodSelectedListener,
     AppCompatActivity() {
-
-    override fun onMoodSelected(effectId: Int) {
-        val effect = LampEffect.moodFromId(effectId)
-        ledLamp.setEffect(effect)
-    }
-
-    override fun onEffectSelected(effectId: Int) {
-        val effect = LampEffect.effectFromId(effectId)
-        ledLamp.setEffect(effect)
-    }
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val colorFragment = ColorFragment.newInstance()
-    private val effectFragment = EffectFragment.newInstance()
-    private val moodFragment = MoodFragment.newInstance()
-
-    private fun setFragment(fragment: Fragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container, fragment)
-        transaction.commit()
-    }
-
-    override fun onSetColor(color: RgbColor) {
-        ledLamp.setColor(color)
-    }
-
-    override fun onDebugButtonPressed() {
-        ledLamp.callDebugFunction()
-    }
-
-
     companion object {
         val TAG: String? = MainActivity::class.simpleName
 
@@ -75,6 +49,41 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         const val REQUEST_BLUETOOTH_PERMISSION = 3
     }
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var bottomMenuBinding: BottomMenuBinding
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val colorFragment = ColorFragment.newInstance()
+    private val effectFragment = EffectFragment.newInstance()
+    private val moodFragment = MoodFragment.newInstance()
+
+
+    private val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
+        override fun onStartTrackingTouch(p0: SeekBar?) {}
+        override fun onStopTrackingTouch(p0: SeekBar?) {}
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, userInitiated: Boolean) {
+            if (userInitiated) {
+                bluetoothService?.setDimFactor(progress)
+            }
+        }
+    }
+
+    private var bluetoothService: BluetoothLeService? = null
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(
+            componentName: ComponentName,
+            service: IBinder
+        ) {
+            bluetoothService = (service as BluetoothLeService.LocalBinder).getService()
+            bluetoothService?.registerLampCallback(lampCallback)
+            checkPermissionsAndConnect()
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            bluetoothService = null
+        }
+    }
 
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onDimFactorReceived(dimFactor: Int) {
@@ -99,30 +108,6 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         }
     }
 
-    private val lampDeviceFoundCallback = object : LampDeviceDiscovery.Callback {
-        override fun onDeviceFound(device: BluetoothDevice) {
-            lampFinder.stop()
-            if (ledLamp.hasNoDevice()) {
-                ledLamp.connectToDevice(device, this@MainActivity)
-            }
-        }
-    }
-
-    private val seekbarListener = object : SeekBar.OnSeekBarChangeListener {
-        override fun onStartTrackingTouch(p0: SeekBar?) {}
-        override fun onStopTrackingTouch(p0: SeekBar?) {}
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, userInitiated: Boolean) {
-            if (userInitiated) {
-                ledLamp.setDimFactor(progress)
-            }
-        }
-    }
-
-    private val lampFinder: LampDeviceDiscovery = LampDeviceDiscovery(lampDeviceFoundCallback)
-    private val ledLamp: LedLamp = LedLamp(this, lampCallback)
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var bottomMenuBinding: BottomMenuBinding
-
     private val imagePickerResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -131,7 +116,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
                         contentResolver,
                         it
                     )
-                    ledLamp.setEffect(LampEffect.fromBitmap(bitmap))
+                    bluetoothService?.setEffect(LampEffect.fromBitmap(bitmap))
                 }
             }
         }
@@ -139,6 +124,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         bottomMenuBinding = BottomMenuBinding.bind(binding.bottomMenu.menuRoot)
         setContentView(binding.root)
         startService(NotificationListener.createIntent(this))
@@ -168,36 +154,25 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
             }
         }
 
+        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
+        bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onStart() {
         super.onStart()
-        checkPermissionsAndConnect()
+        bindService(
+            Intent(this, BluetoothLeService::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
     }
 
-    private fun checkPermissionsAndConnect() {
-        when {
-            !isNotificationAccessGranted() -> startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-            !isAllBluetoothPermissionsGranted() -> requestAllBluetoothPermissions()
-            else -> connectToLampIfNecessary()
-        }
+    override fun onStop() {
+        super.onStop()
+        bluetoothService?.stopLampFinder()
+        unbindService(serviceConnection)
     }
 
-    private fun connectToLampIfNecessary() {
-        if (ledLamp.hasNoDevice()) {
-            Log.i(TAG, "Start Scan")
-            lampFinder.findDevice()
-        } else if (ledLamp.hasDeviceButDisconnected()) {
-            ledLamp.resumeConnection()
-        }
-    }
-
-    private fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "image/*"
-        imagePickerResult.launch(intent)
-    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -220,15 +195,44 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        lampFinder.stop()
+
+    override fun onMoodSelected(effectId: Int) {
+        val effect = LampEffect.moodFromId(effectId)
+        bluetoothService?.setEffect(effect)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        ledLamp.disconnect()
-        ledLamp.destroy()
+    override fun onEffectSelected(effectId: Int) {
+        val effect = LampEffect.effectFromId(effectId)
+        bluetoothService?.setEffect(effect)
+    }
+
+    override fun onSetColor(color: RgbColor) {
+        bluetoothService?.setColor(color)
+    }
+
+    override fun onDebugButtonPressed() {
+        // TODO  ledLamp.callDebugFunction()
+    }
+
+    private fun setFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container, fragment)
+        transaction.commit()
+    }
+
+    private fun checkPermissionsAndConnect() {
+        when {
+            !isNotificationAccessGranted() -> startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            !isAllBluetoothPermissionsGranted() -> requestAllBluetoothPermissions()
+            else -> bluetoothService?.connectToLampIfNecessary()
+        }
+    }
+
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.type = "image/*"
+        imagePickerResult.launch(intent)
     }
 
     private fun isAllBluetoothPermissionsGranted() = bluetoothPermissions.all {
@@ -248,4 +252,9 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
 
     private fun isNotificationAccessGranted() =
         NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bluetoothService?.unregisterLampCallback(lampCallback)
+    }
 }

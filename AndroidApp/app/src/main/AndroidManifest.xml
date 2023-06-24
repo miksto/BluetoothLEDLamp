@@ -51,5 +51,11 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".BluetoothLeService"
+            android:exported="true"
+            android:label="bluetooth_service" />
+
     </application>
 </manifest>

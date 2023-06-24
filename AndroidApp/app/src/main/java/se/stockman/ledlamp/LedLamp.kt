@@ -194,7 +194,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     }
 
 
-    fun notificationAlert(sbn: StatusBarNotification) {
+    fun handleNotification(sbn: StatusBarNotification) {
         if (Settings.isSpotifyIntegrationEnabled(context) && sbn.packageName.contains(SPOTIFY)) {
             val drawable = sbn.notification.getLargeIcon().loadDrawable(context)
             val bitmap = (drawable as BitmapDrawable).bitmap

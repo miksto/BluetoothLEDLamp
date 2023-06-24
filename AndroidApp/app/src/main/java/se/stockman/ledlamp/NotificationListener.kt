@@ -1,11 +1,12 @@
 package se.stockman.ledlamp
 
-import android.bluetooth.BluetoothDevice
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
 import se.stockman.ledlamp.data.RgbColor
 
 /**
@@ -14,6 +15,22 @@ import se.stockman.ledlamp.data.RgbColor
 
 @ExperimentalUnsignedTypes
 class NotificationListener : NotificationListenerService() {
+
+    private var bluetoothService: BluetoothLeService? = null
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(
+            componentName: ComponentName,
+            service: IBinder
+        ) {
+            bluetoothService = (service as BluetoothLeService.LocalBinder).getService()
+            bluetoothService?.registerLampCallback(lampCallback)
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            bluetoothService = null
+        }
+    }
 
     companion object {
         val TAG: String? = NotificationListener::class.simpleName
@@ -28,15 +45,13 @@ class NotificationListener : NotificationListenerService() {
         return START_STICKY
     }
 
-    private var pendingNotification: StatusBarNotification? = null
-    private val lampDeviceFoundCallback = object : LampDeviceDiscovery.Callback {
-        override fun onDeviceFound(device: BluetoothDevice) {
-            lampFinder.stop()
-            if (ledLamp.hasNoDevice()) {
-                ledLamp.connectToDevice(device, this@NotificationListener)
-            }
-        }
+    override fun onCreate() {
+        super.onCreate()
+        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
+        bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
+
+    private var pendingNotification: StatusBarNotification? = null
 
     private val lampCallback = object : LedLamp.LampCallback {
         override fun onDimFactorReceived(dimFactor: Int) {
@@ -47,10 +62,9 @@ class NotificationListener : NotificationListenerService() {
             if (connected) {
                 if (pendingNotification != null) {
                     pendingNotification?.let {
-                        ledLamp.notificationAlert(it)
+                        bluetoothService?.handleNotification(it)
                     }
                     pendingNotification = null
-                    ledLamp.disconnect()
                 }
             }
         }
@@ -60,38 +74,21 @@ class NotificationListener : NotificationListenerService() {
         }
     }
 
-    private val lampFinder: LampDeviceDiscovery = LampDeviceDiscovery(lampDeviceFoundCallback)
-    private val ledLamp: LedLamp = LedLamp(this, lampCallback)
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
-        handleNotificationChange(sbn)
-    }
-
-    private fun handleNotificationChange(sbn: StatusBarNotification?) {
         sbn?.let {
-            Log.i(TAG, "Handling notification")
-            if (ledLamp.hasDeviceWithActiveConnection()) {
-                ledLamp.notificationAlert(it)
-                ledLamp.disconnect()
-            } else {
-                pendingNotification = it
-                connectToLamp()
-            }
+            handleNotificationChange(it)
         }
     }
 
-    private fun connectToLamp() {
-        if (ledLamp.hasNoDevice()) {
-            lampFinder.findDevice()
-        } else if (ledLamp.hasDeviceButDisconnected()) {
-            ledLamp.resumeConnection()
-        }
+    private fun handleNotificationChange(notification: StatusBarNotification) {
+        bluetoothService?.handleNotification(notification)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        ledLamp.destroy()
-        lampFinder.stop()
+        bluetoothService?.stopLampFinder()
+        bluetoothService?.unregisterLampCallback(lampCallback)
     }
 }

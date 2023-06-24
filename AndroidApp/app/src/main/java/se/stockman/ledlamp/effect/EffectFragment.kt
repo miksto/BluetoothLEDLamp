@@ -35,7 +35,7 @@ class EffectFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.gridview.adapter = EffectAdapter()
-        binding.gridview.setOnItemClickListener { _, _, _, id -> listener!!.onEffectSelected(id.toInt()) }
+        binding.gridview.setOnItemClickListener { _, _, _, id -> listener?.onEffectSelected(id.toInt()) }
     }
 
     override fun onAttach(context: Context) {
@@ -43,7 +43,7 @@ class EffectFragment : BaseFragment() {
         if (context is OnEffectSelectedListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
