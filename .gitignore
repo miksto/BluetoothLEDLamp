@@ -2,3 +2,4 @@ gradle.properties
 AndroidApp/.idea
 google-services.json
 .env
+.DS_STORE
