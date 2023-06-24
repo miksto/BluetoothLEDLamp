@@ -13,9 +13,9 @@ class SunsetDataObject(
     override fun toByteArray(): ByteArray {
         val bytes = ByteArray(4)
         bytes[0] = timeDuration.toByte()
-        bytes[1] = (colorInterval * 255).toByte()
-        bytes[2] = (startHue * 255).toByte()
-        bytes[3] = (endHue * 255).toByte()
+        bytes[1] = (colorInterval * 255).toInt().toByte()
+        bytes[2] = (startHue * 255).toInt().toByte()
+        bytes[3] = (endHue * 255).toInt().toByte()
         return bytes;
     }
 

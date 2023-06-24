@@ -20,7 +20,7 @@
         android:id="@+id/effect_icon"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal" />
 
 
 </LinearLayout>

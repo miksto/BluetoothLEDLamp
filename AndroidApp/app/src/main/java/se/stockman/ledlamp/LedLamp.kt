@@ -1,6 +1,10 @@
 package se.stockman.ledlamp
 
-import android.bluetooth.*
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.os.Handler
@@ -15,7 +19,7 @@ import se.stockman.ledlamp.data.HlsColorDataObject
 import se.stockman.ledlamp.data.LampEffect
 import se.stockman.ledlamp.data.RgbColor
 import se.stockman.ledlamp.settings.Settings
-import java.util.*
+import java.util.UUID
 
 /**
  * Created by Mikael Stockman on 2019-09-07.
@@ -86,6 +90,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                     gatt?.requestMtu(517)
                     Log.i(TAG, "Connected to GATT server.")
                 }
+
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.i(TAG, "Disconnected from GATT server.")
                     connected = false
@@ -107,6 +112,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                     callback.onConnectionStateChange(connected)
                     readCurrentColor()
                 }
+
                 else -> {
                     Log.w(TAG, "onServicesDiscovered received: $status")
                 }

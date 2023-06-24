@@ -106,7 +106,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
 
-        <include layout="@layout/bottom_menu" />
+        <include
+            android:id="@+id/bottom_menu"
+            layout="@layout/bottom_menu" />
 
     </FrameLayout>
 

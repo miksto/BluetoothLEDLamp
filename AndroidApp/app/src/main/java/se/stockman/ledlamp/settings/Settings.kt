@@ -25,7 +25,8 @@ class Settings {
         }
 
         fun setNotificationFlashEnabled(context: Context, enabled: Boolean) {
-            getSharedPrefs(context)!!.edit().putBoolean(NOTIFICATION_FLASH_ENABLED, enabled)?.apply()
+            getSharedPrefs(context)!!.edit().putBoolean(NOTIFICATION_FLASH_ENABLED, enabled)
+                ?.apply()
         }
 
         fun isNotificationFlashEnabled(context: Context): Boolean {

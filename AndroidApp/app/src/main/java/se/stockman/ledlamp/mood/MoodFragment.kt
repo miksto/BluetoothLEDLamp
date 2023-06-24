@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_effect.*
 import se.stockman.ledlamp.BaseFragment
-import se.stockman.ledlamp.R
+import se.stockman.ledlamp.databinding.FragmentMoodBinding
 
 class MoodFragment : BaseFragment() {
+    private var _binding: FragmentMoodBinding? = null
+    private val binding get() = _binding!!
     override fun onConnectionStateChange(connected: Boolean) {
 
     }
@@ -18,17 +18,25 @@ class MoodFragment : BaseFragment() {
     private var listener: OnMoodSelectedListener? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_mood, container, false)
+    ): View {
+        _binding = FragmentMoodBinding.inflate(inflater, container, false)
+        return binding.root
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        gridview.adapter = MoodAdapter()
-        gridview.setOnItemClickListener { _, _, _, id ->
-            listener!!.onMoodSelected(id.toInt())
+        binding.gridview.adapter = MoodAdapter()
+        binding.gridview.setOnItemClickListener { _, _, _, id ->
+            listener?.onMoodSelected(id.toInt())
         }
     }
 

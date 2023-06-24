@@ -2,7 +2,10 @@ package se.stockman.ledlamp
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.*
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.util.Log
 
 /**
@@ -27,7 +30,8 @@ class LampDeviceDiscovery(val callback: Callback) {
 
     fun findDevice() {
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-        val device = pairedDevices?.find { bluetoothDevice -> bluetoothDevice.address == BLE_DEVICE_MAC }
+        val device =
+            pairedDevices?.find { bluetoothDevice -> bluetoothDevice.address == BLE_DEVICE_MAC }
 
         if (device != null) {
             Log.i(TAG, "Found bonded device")

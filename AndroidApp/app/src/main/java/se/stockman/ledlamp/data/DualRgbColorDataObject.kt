@@ -3,7 +3,8 @@ package se.stockman.ledlamp.data
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */
-class DualRgbColorDataObject(val color1: RgbColor, val color2: RgbColor) : DataObject {
+class DualRgbColorDataObject(private val color1: RgbColor, private val color2: RgbColor) :
+    DataObject {
 
     override fun toByteArray(): ByteArray {
         val bytes = ByteArray(6)

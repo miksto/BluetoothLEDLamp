@@ -6,14 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import kotlinx.android.synthetic.main.fragment_color.*
 import se.stockman.ledlamp.BaseFragment
-import se.stockman.ledlamp.R
 import se.stockman.ledlamp.data.RgbColor
+import se.stockman.ledlamp.databinding.FragmentColorBinding
 
 class ColorFragment : BaseFragment() {
-    var currentColor: RgbColor? = null
-    var connected = false
+    private var _binding: FragmentColorBinding? = null
+    private val binding get() = _binding!!
+
+    private var currentColor: RgbColor? = null
+    private var connected = false
 
     override fun onConnectionStateChange(connected: Boolean) {
         this@ColorFragment.connected = connected
@@ -36,27 +38,12 @@ class ColorFragment : BaseFragment() {
             // Display the current progress of SeekBar
             if (userInitiated) {
                 val color = RgbColor(
-                    seek_bar_color_red.progress,
-                    seek_bar_color_green.progress,
-                    seek_bar_color_blue.progress
+                    binding.seekBarColorRed.progress,
+                    binding.seekBarColorGreen.progress,
+                    binding.seekBarColorBlue.progress
                 )
                 listener?.onSetColor(color)
             }
-        }
-    }
-
-    private fun updateView() {
-        if (view == null) {
-            return
-        }
-        seek_bar_color_red?.isEnabled = connected
-        seek_bar_color_green?.isEnabled = connected
-        seek_bar_color_blue?.isEnabled = connected
-
-        currentColor?.let {
-            seek_bar_color_red?.progress = it.red
-            seek_bar_color_green?.progress = it.green
-            seek_bar_color_blue?.progress = it.blue
         }
     }
 
@@ -67,14 +54,20 @@ class ColorFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_color, container, false)
+    ): View {
+        _binding = FragmentColorBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        seek_bar_color_red.setOnSeekBarChangeListener(seekbarListener)
-        seek_bar_color_green.setOnSeekBarChangeListener(seekbarListener)
-        seek_bar_color_blue.setOnSeekBarChangeListener(seekbarListener)
+        binding.seekBarColorRed.setOnSeekBarChangeListener(seekbarListener)
+        binding.seekBarColorGreen.setOnSeekBarChangeListener(seekbarListener)
+        binding.seekBarColorBlue.setOnSeekBarChangeListener(seekbarListener)
         updateView()
     }
 
@@ -84,7 +77,7 @@ class ColorFragment : BaseFragment() {
         if (context is OnFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
@@ -96,6 +89,22 @@ class ColorFragment : BaseFragment() {
     fun setColor(color: RgbColor) {
         currentColor = color
         view?.post { updateView() }
+    }
+
+
+    private fun updateView() {
+        if (view == null) {
+            return
+        }
+        binding.seekBarColorRed.isEnabled = connected
+        binding.seekBarColorGreen.isEnabled = connected
+        binding.seekBarColorBlue.isEnabled = connected
+
+        currentColor?.let {
+            binding.seekBarColorRed.progress = it.red
+            binding.seekBarColorGreen.progress = it.green
+            binding.seekBarColorBlue.progress = it.blue
+        }
     }
 
     interface OnFragmentInteractionListener {

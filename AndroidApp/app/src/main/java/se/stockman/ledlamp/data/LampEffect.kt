@@ -37,10 +37,12 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     RgbColor(200, 14, 0),
                     RgbColor(33, 0, 1)
                 )
+
                 MoodAdapter.sunset2 -> createGlimmerEffect(
                     RgbColor(200, 14, 0),
                     RgbColor(200, 28, 0)
                 )
+
                 MoodAdapter.timed_sunset -> LampEffect(
                     esp_32_timed_sunset,
                     SunsetDataObject(
@@ -50,43 +52,53 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                         endHue = 0.95f
                     )
                 )
+
                 MoodAdapter.woods -> createGlimmerEffect(
                     RgbColor(0, 25, 1),
                     RgbColor(0, 0, 0)
                 )
+
                 MoodAdapter.sakura -> createGlimmerEffect(
                     RgbColor(174, 21, 31),
                     RgbColor(80, 60, 120)
                 )
+
                 MoodAdapter.ruby_room -> createGlimmerEffect(
                     RgbColor(33, 0, 1),
                     RgbColor(100, 100, 100)
                 )
+
                 MoodAdapter.star_night -> createGlimmerEffect(
                     RgbColor(0, 0, 15),
                     RgbColor(5, 5, 80)
                 )
+
                 MoodAdapter.flower_field -> createGradientEffect(
                     RgbColor(200, 0, 170),
                     RgbColor(20, 20, 200)
                 )
+
                 MoodAdapter.fall -> createPatchyColorsEffect(
                     RgbColor(150, 25, 0),
                     RgbColor(200, 170, 0),
                     RgbColor(80, 200, 0)
                 )
+
                 MoodAdapter.brown_landscape -> createGradientEffect(
                     RgbColor(110, 33, 0),
                     RgbColor(110, 53, 0)
                 )
+
                 MoodAdapter.clouds_effect -> createCloudsEffect(
                     RgbColor(40, 40, 200),
                     RgbColor(150, 150, 200)
                 )
+
                 MoodAdapter.fire_effect -> createCloudsEffect(
                     RgbColor(200, 25, 0),
                     RgbColor(200, 8, 0)
                 )
+
                 else -> throw IllegalArgumentException("Not supported mood id")
             }
         }
@@ -97,14 +109,17 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
                     esp_32_rotating_rainbow,
                     RotatingRainbbowDataObject(colorInterval = 0.8f, speed = 0.5f)
                 )
+
                 EffectAdapter.flowy_colors -> LampEffect(
                     esp_32_rotating_rainbow,
                     RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 0.03f)
                 )
+
                 EffectAdapter.fekke -> LampEffect(
                     esp_32_rotating_rainbow,
                     RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 1f)
                 )
+
                 EffectAdapter.fakka_ur -> LampEffect(esp_32_fakka_ur, null)
                 EffectAdapter.beacon_light -> LampEffect(esp_32_beacon_light, null)
                 EffectAdapter.color_loop -> LampEffect(esp_32_color_loop, null)

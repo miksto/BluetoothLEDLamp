@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_effect.*
 import se.stockman.ledlamp.BaseFragment
-import se.stockman.ledlamp.R
+import se.stockman.ledlamp.databinding.FragmentEffectBinding
 
 
 class EffectFragment : BaseFragment() {
+    private var _binding: FragmentEffectBinding? = null
+    private val binding get() = _binding!!
     override fun onConnectionStateChange(connected: Boolean) {
 
     }
@@ -18,16 +19,23 @@ class EffectFragment : BaseFragment() {
     private var listener: OnEffectSelectedListener? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_effect, container, false)
+    ): View {
+        _binding = FragmentEffectBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        gridview.adapter = EffectAdapter()
-        gridview.setOnItemClickListener { _, _, _, id -> listener!!.onEffectSelected(id.toInt()) }
+        binding.gridview.adapter = EffectAdapter()
+        binding.gridview.setOnItemClickListener { _, _, _, id -> listener!!.onEffectSelected(id.toInt()) }
     }
 
     override fun onAttach(context: Context) {

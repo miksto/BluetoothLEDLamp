@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import kotlinx.android.synthetic.main.effect_grid_item.view.*
 import se.stockman.ledlamp.R
+import se.stockman.ledlamp.databinding.EffectGridItemBinding
 
 /**
  * Created by Mikael Stockman on 2019-09-25.
@@ -101,19 +101,16 @@ class MoodAdapter : BaseAdapter() {
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view: View
-        if (convertView == null) {
-            view = LayoutInflater.from(parent?.context)
-                .inflate(R.layout.effect_grid_item, parent, false)
-        } else {
-            view = convertView
-        }
+        val binding = convertView?.let { EffectGridItemBinding.bind(it) }
+            ?: parent?.context?.let { EffectGridItemBinding.inflate(LayoutInflater.from(it)) }
+            ?: error("No parent view in adapter")
+
         val item = items[position]
         val name = parent?.context?.getString(item.name)
 
-        view.effect_name.text = name
-        view.effect_icon.setImageResource(item.icon)
-        return view
+        binding.effectName.text = name
+        binding.effectIcon.setImageResource(item.icon)
+        return binding.root
     }
 
     override fun getItem(position: Int): Any {
