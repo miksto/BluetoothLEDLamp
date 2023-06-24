@@ -12,8 +12,8 @@ android {
         applicationId "se.stockman.ledlamp"
         minSdkVersion 33
         targetSdkVersion 33
-        versionName "1.0.3"
-        versionCode 7
+        versionName "1.1.0"
+        versionCode 8
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
