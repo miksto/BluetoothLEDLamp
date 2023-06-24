@@ -3,7 +3,7 @@ package se.stockman.ledlamp.data
 /**
  * Created by Mikael Stockman on 2019-10-03.
  */
-class RotatingRainbbowDataObject(
+data class RotatingRainbowDataObject(
     val colorInterval: Float,
     val speed: Float
 ) : DataObject {

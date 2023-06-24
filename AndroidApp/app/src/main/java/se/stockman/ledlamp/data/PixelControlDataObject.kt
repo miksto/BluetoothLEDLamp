@@ -7,15 +7,14 @@ import android.graphics.Color
 /**
  * Created by Mikael Stockman on 2019-10-17.
  */
-class PixelControlDataObject(val colors: Array<RgbColor>) : DataObject {
+data class PixelControlDataObject(val colors: List<RgbColor>) : DataObject {
 
     companion object {
         fun fromImage(bitmap: Bitmap): PixelControlDataObject {
             val strideX = bitmap.width / 7
             val strideY = bitmap.height / 18
 
-
-            val pixels = Array(121) { i ->
+            val pixels = List(121) { i ->
                 val y = (i / 7) * strideY
                 val x = (i % 7) * strideX
                 val floats = FloatArray(3)
@@ -30,8 +29,7 @@ class PixelControlDataObject(val colors: Array<RgbColor>) : DataObject {
                     Color.blue(pixel)
                 )
             }
-            pixels.reverse()
-            return PixelControlDataObject(pixels)
+            return PixelControlDataObject(pixels.reversed())
         }
     }
 

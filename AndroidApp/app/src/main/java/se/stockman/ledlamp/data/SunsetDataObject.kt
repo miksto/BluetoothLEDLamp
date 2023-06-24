@@ -3,7 +3,7 @@ package se.stockman.ledlamp.data
 /**
  * Created by Mikael Stockman on 2019-10-03.
  */
-class SunsetDataObject(
+data class SunsetDataObject(
     val timeDuration: Int,
     val colorInterval: Float,
     val startHue: Float,

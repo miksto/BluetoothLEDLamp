@@ -151,8 +151,9 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     }
 
     fun setColor(color: HlsColor) {
-        color.lightness = Integer.min(color.lightness, 180)
-        val colorDataObject = HlsColorDataObject(color)
+        val colorDataObject = HlsColorDataObject(
+            color.copy(lightness = color.lightness.coerceAtMost(180))
+        )
         val characteristic =
             gatt?.getService(UUID.fromString(LAMP_SERVICE_UUID))
                 ?.getCharacteristic(UUID.fromString(LAMP_COLOR_CHARACTERISTIC_UUID))

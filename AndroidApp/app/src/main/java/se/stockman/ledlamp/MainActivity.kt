@@ -119,7 +119,7 @@ class MainActivity : ColorFragment.OnFragmentInteractionListener,
     }
 
     private val lampFinder: LampDeviceDiscovery = LampDeviceDiscovery(lampDeviceFoundCallback)
-    private var ledLamp: LedLamp = LedLamp(this, lampCallback)
+    private val ledLamp: LedLamp = LedLamp(this, lampCallback)
     private lateinit var binding: ActivityMainBinding
     private lateinit var bottomMenuBinding: BottomMenuBinding
 

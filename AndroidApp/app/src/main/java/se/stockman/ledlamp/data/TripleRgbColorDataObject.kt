@@ -3,8 +3,11 @@ package se.stockman.ledlamp.data
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */
-class TripleRgbColorDataObject(val color1: RgbColor, val color2: RgbColor, val color3: RgbColor) :
-    DataObject {
+data class TripleRgbColorDataObject(
+    val color1: RgbColor,
+    val color2: RgbColor,
+    val color3: RgbColor
+) : DataObject {
 
     override fun toByteArray(): ByteArray {
         val bytes = ByteArray(9)

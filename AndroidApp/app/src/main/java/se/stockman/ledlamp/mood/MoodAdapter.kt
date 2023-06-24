@@ -30,75 +30,71 @@ class MoodAdapter : BaseAdapter() {
         const val brown_landscape = 111
     }
 
-    private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
+    private data class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
 
-    private var items: List<EffectItem>
-
-
-    init {
-        items = listOf(
-            EffectItem(
-                sunset,
-                R.string.mood_sunset,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                sunset2,
-                R.string.mood_sunset2,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                timed_sunset,
-                R.string.mood_timed_sunset,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                woods,
-                R.string.mood_woods,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                sakura,
-                R.string.mood_sakura,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                ruby_room,
-                R.string.mood_ruby,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                star_night,
-                R.string.mood_star_night,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                flower_field,
-                R.string.mood_flower_field,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                fall,
-                R.string.mood_fall,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                brown_landscape,
-                R.string.mood_brown_landscape,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                clouds_effect,
-                R.string.mood_clouds,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                fire_effect,
-                R.string.mood_fire,
-                R.drawable.ic_menu_color_blend
-            )
+    private val items: List<EffectItem> = listOf(
+        EffectItem(
+            sunset,
+            R.string.mood_sunset,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            sunset2,
+            R.string.mood_sunset2,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            timed_sunset,
+            R.string.mood_timed_sunset,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            woods,
+            R.string.mood_woods,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            sakura,
+            R.string.mood_sakura,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            ruby_room,
+            R.string.mood_ruby,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            star_night,
+            R.string.mood_star_night,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            flower_field,
+            R.string.mood_flower_field,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            fall,
+            R.string.mood_fall,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            brown_landscape,
+            R.string.mood_brown_landscape,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            clouds_effect,
+            R.string.mood_clouds,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            fire_effect,
+            R.string.mood_fire,
+            R.drawable.ic_menu_color_blend
         )
-    }
+    )
+
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val binding = convertView?.let { EffectGridItemBinding.bind(it) }

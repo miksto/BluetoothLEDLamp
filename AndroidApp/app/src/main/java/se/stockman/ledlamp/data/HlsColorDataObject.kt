@@ -3,7 +3,7 @@ package se.stockman.ledlamp.data
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */
-class HlsColorDataObject(val color: HlsColor) : DataObject {
+data class HlsColorDataObject(val color: HlsColor) : DataObject {
 
     companion object {
         fun fromByteArray(byteArray: ByteArray): HlsColorDataObject {

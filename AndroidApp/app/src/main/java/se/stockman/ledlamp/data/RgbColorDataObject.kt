@@ -3,7 +3,7 @@ package se.stockman.ledlamp.data
 /**
  * Created by Mikael Stockman on 2019-09-07.
  */
-class RgbColorDataObject(val color: RgbColor) : DataObject {
+data class RgbColorDataObject(val color: RgbColor) : DataObject {
 
     companion object {
         fun fromByteArray(byteArray: ByteArray): RgbColorDataObject {

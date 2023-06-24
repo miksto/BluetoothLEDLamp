@@ -7,7 +7,7 @@ import se.stockman.ledlamp.mood.MoodAdapter
 /**
  * Created by Mikael Stockman on 2019-09-25.
  */
-class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
+data class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
 
     override fun toByteArray(): ByteArray {
         var bytes = byteArrayOf(effectId.toByte())
@@ -107,17 +107,17 @@ class LampEffect(val effectId: Int, val data: DataObject?) : DataObject {
             return when (id) {
                 EffectAdapter.rotating_rainbow -> LampEffect(
                     esp_32_rotating_rainbow,
-                    RotatingRainbbowDataObject(colorInterval = 0.8f, speed = 0.5f)
+                    RotatingRainbowDataObject(colorInterval = 0.8f, speed = 0.5f)
                 )
 
                 EffectAdapter.flowy_colors -> LampEffect(
                     esp_32_rotating_rainbow,
-                    RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 0.03f)
+                    RotatingRainbowDataObject(colorInterval = 0.25f, speed = 0.03f)
                 )
 
                 EffectAdapter.fekke -> LampEffect(
                     esp_32_rotating_rainbow,
-                    RotatingRainbbowDataObject(colorInterval = 0.25f, speed = 1f)
+                    RotatingRainbowDataObject(colorInterval = 0.25f, speed = 1f)
                 )
 
                 EffectAdapter.fakka_ur -> LampEffect(esp_32_fakka_ur, null)

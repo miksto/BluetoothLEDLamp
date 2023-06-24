@@ -26,50 +26,46 @@ class EffectAdapter : BaseAdapter() {
         const val pixel_control = 8
     }
 
-    private class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
+    private data class EffectItem(val id: Int, @StringRes val name: Int, @DrawableRes val icon: Int)
 
-    private var items: List<EffectItem>
-
-
-    init {
-        items = listOf(
-            EffectItem(
-                beacon_light,
-                R.string.beacon_light,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                color_loop,
-                R.string.color_loop,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                rotating_lines,
-                R.string.rotating_lines,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                rotating_rainbow,
-                R.string.rotating_rainbow,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                flowy_colors,
-                R.string.flowy_colors,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                fekke,
-                R.string.fekke,
-                R.drawable.ic_menu_color_blend
-            ),
-            EffectItem(
-                fakka_ur,
-                R.string.fakka_ur,
-                R.drawable.ic_menu_color_blend
-            )
+    private val items: List<EffectItem> = listOf(
+        EffectItem(
+            beacon_light,
+            R.string.beacon_light,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            color_loop,
+            R.string.color_loop,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            rotating_lines,
+            R.string.rotating_lines,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            rotating_rainbow,
+            R.string.rotating_rainbow,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            flowy_colors,
+            R.string.flowy_colors,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            fekke,
+            R.string.fekke,
+            R.drawable.ic_menu_color_blend
+        ),
+        EffectItem(
+            fakka_ur,
+            R.string.fakka_ur,
+            R.drawable.ic_menu_color_blend
         )
-    }
+    )
+
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val binding = convertView?.let { EffectGridItemBinding.bind(it) }

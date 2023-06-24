@@ -61,7 +61,7 @@ class NotificationListener : NotificationListenerService() {
     }
 
     private val lampFinder: LampDeviceDiscovery = LampDeviceDiscovery(lampDeviceFoundCallback)
-    private var ledLamp: LedLamp = LedLamp(this, lampCallback)
+    private val ledLamp: LedLamp = LedLamp(this, lampCallback)
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
