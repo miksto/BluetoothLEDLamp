@@ -13,13 +13,17 @@ import se.stockman.ledlamp.data.RgbColor
 @OptIn(ExperimentalUnsignedTypes::class)
 class BluetoothLeService : Service() {
 
+    companion object {
+        val TAG: String? = LampDeviceDiscovery::class.simpleName
+    }
+
     private var pendingNotification: StatusBarNotification? = null
     private val listeners = mutableSetOf<LedLamp.LampCallback>()
 
     private val lampDeviceFoundCallback = object : LampDeviceDiscovery.Callback {
         override fun onDeviceFound(device: BluetoothDevice) {
             lampFinder.stop()
-            if (ledLamp.hasNoDevice()) {
+            if (ledLamp.hasGatt()) {
                 ledLamp.connectToDevice(device, this@BluetoothLeService)
             }
         }
@@ -52,18 +56,17 @@ class BluetoothLeService : Service() {
     }
 
     fun connectToLampIfNecessary() {
-        if (ledLamp.hasNoDevice()) {
-            Log.i(MainActivity.TAG, "Start Scan")
+        if (ledLamp.hasGatt()) {
+            Log.i(TAG, "Ledlamp has no Gatt")
             lampFinder.findDevice()
-        } else if (ledLamp.hasDeviceButDisconnected()) {
+        } else if (ledLamp.hasGattButIsDisconnected()) {
+            Log.i(TAG, "Ledlamp has no Gatt but is not connected")
             ledLamp.resumeConnection()
+        } else {
+            Log.i(TAG, "Ledlamp is already connected")
+            ledLamp.readCurrentState()
+            lampCallback.onConnectionStateChange(true)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        ledLamp.disconnect()
-        ledLamp.destroy()
     }
 
     fun stopLampFinder() {
@@ -92,11 +95,16 @@ class BluetoothLeService : Service() {
 
     fun handleNotification(notification: StatusBarNotification) {
         Log.i(NotificationListener.TAG, "Handling notification")
-        if (ledLamp.hasDeviceWithActiveConnection()) {
+        if (ledLamp.hasGattAndIsConnected()) {
             ledLamp.handleNotification(notification)
         } else {
             pendingNotification = notification
             connectToLampIfNecessary()
         }
+    }
+
+    override fun onDestroy() {
+        ledLamp.destroy()
+        super.onDestroy()
     }
 }

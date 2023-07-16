@@ -90,5 +90,6 @@ class NotificationListener : NotificationListenerService() {
         super.onDestroy()
         bluetoothService?.stopLampFinder()
         bluetoothService?.unregisterLampCallback(lampCallback)
+        unbindService(serviceConnection)
     }
 }

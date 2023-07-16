@@ -77,7 +77,8 @@ class MainActivity :
         ) {
             bluetoothService = (service as BluetoothLeService.LocalBinder).getService()
             bluetoothService?.registerLampCallback(lampCallback)
-            checkPermissionsAndConnect()
+
+            checkPermissionsAndConnectToLamp()
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
@@ -153,13 +154,11 @@ class MainActivity :
                 )
             }
         }
-
-        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
-        bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onStart() {
         super.onStart()
+        binding.loadingOverlay.visibility = View.VISIBLE
         bindService(
             Intent(this, BluetoothLeService::class.java),
             serviceConnection,
@@ -170,6 +169,7 @@ class MainActivity :
     override fun onStop() {
         super.onStop()
         bluetoothService?.stopLampFinder()
+        bluetoothService?.unregisterLampCallback(lampCallback)
         unbindService(serviceConnection)
     }
 
@@ -180,7 +180,7 @@ class MainActivity :
         grantResults: IntArray
     ) {
         when (requestCode) {
-            REQUEST_BLUETOOTH_PERMISSION -> checkPermissionsAndConnect()
+            REQUEST_BLUETOOTH_PERMISSION -> checkPermissionsAndConnectToLamp()
 
             REQUEST_STORAGE_PERMISSION ->
                 when (grantResults) {
@@ -220,7 +220,7 @@ class MainActivity :
         transaction.commit()
     }
 
-    private fun checkPermissionsAndConnect() {
+    private fun checkPermissionsAndConnectToLamp() {
         when {
             !isNotificationAccessGranted() -> startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
             !isAllBluetoothPermissionsGranted() -> requestAllBluetoothPermissions()
@@ -252,9 +252,4 @@ class MainActivity :
 
     private fun isNotificationAccessGranted() =
         NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
-
-    override fun onDestroy() {
-        super.onDestroy()
-        bluetoothService?.unregisterLampCallback(lampCallback)
-    }
 }

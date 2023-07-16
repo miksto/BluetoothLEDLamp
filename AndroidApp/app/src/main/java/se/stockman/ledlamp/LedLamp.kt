@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
-import android.os.Handler
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.core.graphics.blue
@@ -37,7 +36,6 @@ const val LAMP_DIM_FACTOR_CHARACTERISTIC_UUID = "836457c0-1c54-419f-945b-587ffef
 class LedLamp(private val context: Context, private val callback: LampCallback) {
     companion object {
         val TAG: String? = LedLamp::class.simpleName
-        val handler = Handler()
         const val SPOTIFY = "spotify"
     }
 
@@ -47,28 +45,23 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
         fun onConnectionStateChange(connected: Boolean)
     }
 
-    private var device: BluetoothDevice? = null
     private var gatt: BluetoothGatt? = null
     private var connected = false
 
     fun connectToDevice(device: BluetoothDevice, context: Context) {
-        this.device = device
         gatt = device.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
-        if (device.bondState == BluetoothDevice.BOND_NONE) {
-            device.createBond()
-        }
     }
 
-    fun hasNoDevice(): Boolean {
-        return device == null
+    fun hasGatt(): Boolean {
+        return gatt == null
     }
 
-    fun hasDeviceWithActiveConnection(): Boolean {
-        return device != null && connected
+    fun hasGattAndIsConnected(): Boolean {
+        return gatt != null && connected
     }
 
-    fun hasDeviceButDisconnected(): Boolean {
-        return device != null && !connected
+    fun hasGattButIsDisconnected(): Boolean {
+        return gatt != null && !connected
     }
 
     fun disconnect() {
@@ -82,7 +75,6 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
     fun destroy() {
         gatt?.close()
         gatt = null
-        device = null
     }
 
     private val gattCallback = object : BluetoothGattCallback() {
@@ -109,7 +101,7 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                 BluetoothGatt.GATT_SUCCESS -> {
                     connected = true
                     callback.onConnectionStateChange(connected)
-                    readCurrentColor()
+                    readCurrentState()
                 }
 
                 else -> {
@@ -133,6 +125,10 @@ class LedLamp(private val context: Context, private val callback: LampCallback) 
                 readDimFactor()
             }
         }
+    }
+
+    fun readCurrentState() {
+        readCurrentColor()
     }
 
     private fun readCurrentColor() {
