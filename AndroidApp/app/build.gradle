@@ -44,7 +44,7 @@ dependencies {
     implementation 'androidx.palette:palette-ktx:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.firebase:firebase-analytics-ktx:21.3.0'
-    implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
+    implementation 'com.google.firebase:firebase-crashlytics:18.4.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
