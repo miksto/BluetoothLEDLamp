@@ -15,20 +15,20 @@ For a description of how the actual lamp was built see [https://miksto.github.io
 
 ## The lamp itself
 <p align="middle">
-<img src="img/lamp-purple-orange.jpg" width="48%">
-<img src="img/lamp-purple-blue.jpg" width="48%">
+<img src="img/lamp-purple-orange.jpg" alt="Photo of the led lamp displaying a picture of a colorful comet" width="48%">
+<img src="img/lamp-purple-blue.jpg" alt="Photo of the led lamp displaying picture of super nova" width="48%">
 </p>
 
 
 ## App screenshots
 <p align="middle">
-<img src="img/app-moods.jpg" width="48%">
-<img src="img/app-effects.jpg" width="48%">
+<img src="img/app-moods.jpg" alt="Screenshot of the moods tab in the Android app" width="48%">
+<img src="img/app-effects.jpg" alt="Screenshot of the effects tab in the Android app" width="48%">
 </p>
 
 <p align="middle">
-<img src="img/app-color-selector.jpg" width="48%">
-<img src="img/app-settings.jpg" width="48%">
+<img src="img/app-color-selector.jpg" alt="Screenshot of the color selector tag in the Android app" width="48%">
+<img src="img/app-settings.jpg" alt="Screenshot of the settings screen in the Android app" width="48%">
 </p>
 
 
